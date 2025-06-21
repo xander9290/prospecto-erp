@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "bootswatch/dist/brite/bootstrap.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
