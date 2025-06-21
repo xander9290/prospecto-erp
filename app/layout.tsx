@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "bootswatch/dist/brite/bootstrap.css";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Prospecto ERP",
@@ -12,8 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body>{children}</body>
+    <html lang="es" data-bs-theme="dark">
+      <body>
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }
