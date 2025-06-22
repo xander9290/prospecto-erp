@@ -1,6 +1,9 @@
 import FormLogin from "@/components/forms/FormLogin";
+import { initAdminUser } from "@/libs/initAdmin";
 
-function PageLogin() {
+async function PageLogin() {
+  await initAdminUser();
+
   return <FormLogin />;
 }
 

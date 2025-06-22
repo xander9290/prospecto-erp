@@ -1,9 +1,11 @@
 "use client";
 
+import { userRequest } from "@/app/actions/user-actions";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
+import toast from "react-hot-toast";
 
 type TInputs = {
   name: string;
@@ -11,6 +13,7 @@ type TInputs = {
 };
 
 function FormRegister() {
+  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -19,7 +22,22 @@ function FormRegister() {
   } = useForm<TInputs>();
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
-    console.log(data);
+    setLoading(true);
+    const toastId = toast.loading("Enviando solicitud...", {
+      position: "top-center",
+    });
+
+    const res = await userRequest(data);
+
+    if (!res.success) {
+      toast.error(res.message, { id: toastId });
+      setLoading(false);
+      return;
+    }
+
+    toast.success(res.message, { id: toastId });
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -40,7 +58,7 @@ function FormRegister() {
                 <i className="bi bi-house-fill"></i>
               </Link>
             </div>
-            <fieldset className="card-body">
+            <fieldset className="card-body" disabled={loading}>
               <Form.Group controlId="User" className="mb-3">
                 <Form.Label>Nombre</Form.Label>
                 <Form.Control
@@ -62,7 +80,7 @@ function FormRegister() {
                   {...register("email", {
                     required: "Este campo es requerido",
                   })}
-                  type="password"
+                  type="text"
                   autoComplete="off"
                   className="fs-4"
                   isInvalid={!!errors.email}

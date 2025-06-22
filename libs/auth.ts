@@ -1,5 +1,7 @@
 import NextAuth, { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import prisma from "./prisma";
+import bcrypt from "bcryptjs";
 
 export const authOptions = {
   providers: [
@@ -8,16 +10,45 @@ export const authOptions = {
         email: {},
         password: {},
       },
-      authorize: async () => {
+      authorize: async (credentials) => {
         let user = null;
+        const { email, password } = credentials || {};
 
-        return user;
+        user = await prisma.user.findUnique({
+          where: { userName: email as string },
+          include: { Partner: true },
+        });
+
+        if (!user) {
+          throw new Error("Credenciales inválidas");
+        }
+
+        const verifiedPassword = await bcrypt.compare(
+          password as string,
+          user.password
+        );
+
+        if (!verifiedPassword) {
+          throw new Error("Credenciales inválidas");
+        }
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { lastLogin: new Date() },
+        });
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.Partner.name,
+          image: user.imageUrl,
+        };
       },
     }),
   ],
   session: {
     strategy: "jwt",
-    maxAge: 60 * 60 * 24, // 30 días
+    maxAge: 60 * 60 * 24, // 1 día por defecto
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
@@ -30,6 +61,7 @@ export const authOptions = {
         token.email = user.email;
         token.name = user.name;
       }
+
       return token;
     },
     async session({ session, token }) {

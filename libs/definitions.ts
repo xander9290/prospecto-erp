@@ -17,6 +17,7 @@ export interface User {
   id: string;
   userName: string;
   password: string;
+  email: string;
   imageUrl: string | null;
   imageId: string | null;
   lastLogin: string | null;
@@ -33,7 +34,7 @@ export interface Request {
   name: string;
   email: string;
   accepted: boolean;
-  Users: User[];
+  Users: User | null;
   createdAt: Date;
   updatedAt: Date;
 }

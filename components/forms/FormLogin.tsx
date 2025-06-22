@@ -1,17 +1,20 @@
 "use client";
 
+import { loginUser } from "@/app/actions/user-actions";
 import Link from "next/link";
-import { useEffect } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
+import toast from "react-hot-toast";
 
 type TInputs = {
   userName: string;
   password: string;
-  remember: boolean;
 };
 
 function FormLogin() {
+  const [loading, setLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -20,7 +23,18 @@ function FormLogin() {
   } = useForm<TInputs>();
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
-    console.log(data);
+    setLoading(true);
+    const res = await loginUser(data);
+
+    if (!res.success) {
+      setLoading(false);
+      toast.error(res.message);
+      return;
+    }
+
+    toast.success(res.message, { position: "bottom-right" });
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -41,7 +55,7 @@ function FormLogin() {
                 <i className="bi bi-house-fill"></i>
               </Link>
             </div>
-            <fieldset className="card-body">
+            <fieldset className="card-body" disabled={loading}>
               <Form.Group controlId="User" className="mb-3">
                 <Form.Label>Usuario</Form.Label>
                 <Form.Control
@@ -80,16 +94,11 @@ function FormLogin() {
                   {errors.password?.message}
                 </Form.Control.Feedback>
               </Form.Group>
-              <Form.Group className="mb-3" controlId="remember">
-                <Form.Check
-                  {...register("remember")}
-                  type="checkbox"
-                  label="Recordar"
-                  className="fs-4"
-                />
-              </Form.Group>
               <Form.Group className="d-grid gap-2">
-                <Button type="submit">Entrar</Button>
+                <Button type="submit">
+                  {loading && <Spinner animation="border" size="sm" />}
+                  <span className="ms-2">Entrar</span>
+                </Button>
               </Form.Group>
             </fieldset>
           </Form>
