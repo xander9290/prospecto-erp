@@ -2,6 +2,7 @@
 
 import { userRequest } from "@/app/actions/user-actions";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -13,6 +14,7 @@ type TInputs = {
 };
 
 function FormRegister() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const {
     register,
@@ -38,6 +40,7 @@ function FormRegister() {
     toast.success(res.message, { id: toastId });
 
     setLoading(false);
+    router.replace("/");
   };
 
   useEffect(() => {

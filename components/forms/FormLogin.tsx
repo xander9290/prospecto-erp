@@ -2,6 +2,7 @@
 
 import { loginUser } from "@/app/actions/user-actions";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -13,6 +14,7 @@ type TInputs = {
 };
 
 function FormLogin() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -35,6 +37,8 @@ function FormLogin() {
     toast.success(res.message, { position: "bottom-right" });
 
     setLoading(false);
+
+    router.replace("/app");
   };
 
   useEffect(() => {
@@ -96,8 +100,14 @@ function FormLogin() {
               </Form.Group>
               <Form.Group className="d-grid gap-2">
                 <Button type="submit">
-                  {loading && <Spinner animation="border" size="sm" />}
-                  <span className="ms-2">Entrar</span>
+                  {loading ? (
+                    <>
+                      <Spinner animation="border" size="sm" />
+                      <span className="ms-2">Validando</span>
+                    </>
+                  ) : (
+                    "Entrar"
+                  )}
                 </Button>
               </Form.Group>
             </fieldset>
