@@ -142,7 +142,7 @@ export async function loginUser({
   password: string;
 }): Promise<ActionResponse<unknown>> {
   try {
-    const res = await signIn("credentials", {
+    await signIn("credentials", {
       email: userName,
       password,
       redirect: false,
@@ -153,6 +153,7 @@ export async function loginUser({
       message: "Se ha iniciado la sesión",
     };
   } catch (error: unknown) {
+    console.log(error);
     return {
       success: false,
       message: "Error al validar credenciales",
