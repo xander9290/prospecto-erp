@@ -24,7 +24,7 @@ function FormRegister() {
 
   useEffect(() => {
     setFocus("name");
-  }, []);
+  }, [setFocus]);
 
   return (
     <Container>
@@ -49,7 +49,7 @@ function FormRegister() {
                   })}
                   type="text"
                   autoComplete="off"
-                  className="text-center fs-5"
+                  className="fs-5"
                   isInvalid={!!errors.name}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -64,7 +64,7 @@ function FormRegister() {
                   })}
                   type="password"
                   autoComplete="off"
-                  className="text-center fs-4"
+                  className="fs-4"
                   isInvalid={!!errors.email}
                 />
                 <Form.Control.Feedback type="invalid">

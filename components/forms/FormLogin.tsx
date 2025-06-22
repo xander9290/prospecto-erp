@@ -25,7 +25,7 @@ function FormLogin() {
 
   useEffect(() => {
     setFocus("userName");
-  }, []);
+  }, [setFocus]);
 
   return (
     <Container>

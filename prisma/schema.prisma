@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generate/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Partner {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  Users     User[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("partners")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  userNmae  String    @unique
+  password  String
+  imageUrl  String?   @map("image_url")
+  imageId   String?   @map("image_id")
+  lastLogin DateTime? @map("last_login")
+  Partner   Partner   @relation(fields: [partnerId], references: [id])
+  partnerId String    @map("partner_id")
+  Request   Request?  @relation(fields: [requestId], references: [id])
+  requestId String?   @map("request_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@index([partnerId, requestId])
+  @@map("users")
+}
+
+model Request {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  accepted  Boolean  @default(false)
+  Users     User[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("requests")
+}
+
+model Counter {
+  id    String @id
+  value Int
+
+  @@map("counters")
+}
