@@ -8,7 +8,6 @@ export interface Partner {
   id: string;
   name: string;
   email: string | null;
-  Users: User[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,12 +18,21 @@ export interface User {
   password: string;
   email: string;
   imageUrl: string | null;
-  imageId: string | null;
-  lastLogin: string | null;
+  lastLogin: Date | null;
   Partner: Partner;
   partnerId: string;
   Request: Request | null;
   requestId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ImageSource {
+  id: string;
+  url: string;
+  publicId: string;
+  entityType: string;
+  entityId: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,7 +42,6 @@ export interface Request {
   name: string;
   email: string;
   accepted: boolean;
-  Users: User | null;
   createdAt: Date;
   updatedAt: Date;
 }

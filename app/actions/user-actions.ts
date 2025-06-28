@@ -1,7 +1,7 @@
 "use server";
 
-import { signIn } from "@/libs/auth";
-import { ActionResponse } from "@/libs/definitions";
+import { auth, signIn } from "@/libs/auth";
+import { ActionResponse, User } from "@/libs/definitions";
 import prisma from "@/libs/prisma";
 import bcrypt from "bcryptjs";
 
@@ -157,6 +157,77 @@ export async function loginUser({
     return {
       success: false,
       message: "Error al validar credenciales",
+    };
+  }
+}
+
+export async function fetchUser({
+  id,
+}: {
+  id: string;
+}): Promise<ActionResponse<User>> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        Partner: true,
+        Request: true,
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        message: "Error al encontrar usuario",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Usuario encontrado",
+      data: user,
+    };
+  } catch (error: unknown) {
+    console.error(error);
+    return {
+      success: false,
+      message: "Error al traer usuraio",
+    };
+  }
+}
+
+export async function userImageUpdate(
+  url: string
+): Promise<ActionResponse<unknown>> {
+  try {
+    const session = await auth();
+
+    const changedUser = await prisma.user.update({
+      where: {
+        id: session?.user?.id,
+      },
+      data: {
+        imageUrl: url,
+      },
+    });
+
+    if (!changedUser) {
+      return {
+        success: false,
+        message: "Error al actualizar la url de la imagen",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Se ha actualizado la url de la imagen",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Error al actualizar imageUrl (catch)",
     };
   }
 }

@@ -22,20 +22,31 @@ model Partner {
 model User {
   id        String    @id @default(cuid())
   password  String
-  imageUrl  String?   @map("image_url")
-  imageId   String?   @map("image_id")
   lastLogin DateTime? @map("last_login")
   partnerId String    @unique @map("partner_id")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   userName  String    @unique @map("user_name")
   email     String    @unique
+  imageUrl  String?   @map("image_url")
   Partner   Partner   @relation(fields: [partnerId], references: [id])
   Request   Request?  @relation(fields: [requestId], references: [email])
   requestId String?   @unique @map("resquest_id")
 
   @@index([partnerId, requestId])
   @@map("users")
+}
+
+model Image {
+  id         String   @id @default(cuid())
+  url        String
+  publicId   String   @map("public_id")
+  entityType String
+  entityId   String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("images")
 }
 
 model Request {
