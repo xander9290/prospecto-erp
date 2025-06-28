@@ -4,6 +4,7 @@ import { Readable } from "stream";
 import prisma from "@/libs/prisma"; // tu instancia de prisma
 import cloudinary from "@/libs/cloudinary";
 import { ActionResponse, ImageSource } from "@/libs/definitions";
+import { UploadApiResponse } from "cloudinary";
 
 export async function createImage({
   formData,
@@ -27,7 +28,7 @@ export async function createImage({
   const buffer = Buffer.from(bytes);
 
   try {
-    const result = await new Promise<any>((resolve, reject) => {
+    const result = await new Promise<UploadApiResponse>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: entityType,
@@ -138,6 +139,7 @@ export async function removeImage({
       message: "La imagen ha sido removida",
     };
   } catch (error) {
+    console.log(error);
     return {
       success: false,
       message: "Error al subir imagen",

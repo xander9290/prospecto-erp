@@ -225,6 +225,7 @@ export async function userImageUpdate(
       message: "Se ha actualizado la url de la imagen",
     };
   } catch (error) {
+    console.log(error);
     return {
       success: false,
       message: "Error al actualizar imageUrl (catch)",
