@@ -51,9 +51,9 @@ function FormLogin() {
         <Col xs="12" sm="10" md="7" lg="5" xl="4">
           <Form
             onSubmit={handleSubmit(onSubmit)}
-            className="card bg-body-tertiary  shadow-sm mt-5"
+            className="card shadow-sm mt-5"
           >
-            <div className="card-header d-flex justify-content-between">
+            <div className="card-header d-flex justify-content-between align-items-center">
               <h4 className="card-title">Inicio de sesión</h4>
               <Link className="btn btn-info btn-sm" href="/" title="Inicio">
                 <i className="bi bi-house-fill"></i>

@@ -23,6 +23,7 @@ export interface User {
   partnerId: string;
   Request: Request | null;
   requestId: string | null;
+  darkMode: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

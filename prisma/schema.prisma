@@ -32,6 +32,7 @@ model User {
   Partner   Partner   @relation(fields: [partnerId], references: [id])
   Request   Request?  @relation(fields: [requestId], references: [email])
   requestId String?   @unique @map("resquest_id")
+  darkMode  Boolean   @default(false) @map("dark_mode")
 
   @@index([partnerId, requestId])
   @@map("users")

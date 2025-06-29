@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "bootswatch/dist/brite/bootstrap.css";
+import "bootswatch/dist/cosmo/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { Toaster } from "react-hot-toast";
 
@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" data-bs-theme="dark">
+    <html lang="es">
       <body>
         {children}
         <Toaster />

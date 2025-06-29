@@ -232,3 +232,30 @@ export async function userImageUpdate(
     };
   }
 }
+
+export async function setUserDarkMode(
+  darkMode: boolean
+): Promise<ActionResponse<unknown>> {
+  try {
+    const session = await auth();
+    await prisma.user.update({
+      where: {
+        id: session?.user?.id,
+      },
+      data: {
+        darkMode,
+      },
+    });
+
+    return {
+      success: true,
+      message: "SE ha establecido el modo oscuro",
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      message: "Error al actualizar imageUrl (catch)",
+    };
+  }
+}

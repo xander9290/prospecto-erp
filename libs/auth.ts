@@ -42,6 +42,7 @@ export const authOptions = {
           email: user.email,
           name: user.Partner.name,
           image: user.imageUrl,
+          darkMode: user.darkMode,
         };
       },
     }),
@@ -60,6 +61,7 @@ export const authOptions = {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
+        token.darkMode = user.darkMode;
       }
 
       return token;
@@ -69,6 +71,7 @@ export const authOptions = {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
         session.user.name = token.name as string;
+        session.user.darkMode = token.darkMode as boolean;
       }
       return session;
     },
