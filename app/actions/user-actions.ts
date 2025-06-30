@@ -4,6 +4,7 @@ import { auth, signIn } from "@/libs/auth";
 import { ActionResponse, User } from "@/libs/definitions";
 import prisma from "@/libs/prisma";
 import bcrypt from "bcryptjs";
+import { revalidatePath } from "next/cache";
 
 export async function userRequest({
   name,
@@ -250,6 +251,53 @@ export async function setUserDarkMode(
     return {
       success: true,
       message: "SE ha establecido el modo oscuro",
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      message: "Error al actualizar imageUrl (catch)",
+    };
+  }
+}
+
+export async function updateUserProfile({
+  name,
+  email,
+}: {
+  name: string;
+  email: string;
+}): Promise<ActionResponse<unknown>> {
+  try {
+    const session = await auth();
+
+    const changedUser = await prisma.user.update({
+      where: {
+        id: session?.user.id,
+      },
+      data: {
+        email,
+        Partner: {
+          update: {
+            email,
+            name,
+          },
+        },
+      },
+    });
+
+    if (!changedUser) {
+      return {
+        success: false,
+        message: "Error al actualizar perfil",
+      };
+    }
+
+    revalidatePath("/app/user");
+
+    return {
+      success: true,
+      message: "Se ha actualizado perfil",
     };
   } catch (error) {
     console.log(error);

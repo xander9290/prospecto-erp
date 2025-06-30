@@ -97,14 +97,14 @@ function ImageSource({ entityType, entityId, getUrl }: TImageProps) {
         src={imageSource.url ?? "/image/avatar_default.svg"}
         alt="user_image"
         className="figure-img img-fluid img-thumbnail rounded"
-        width={125}
-        height={125}
+        width={200}
+        height={200}
         unoptimized
         style={{
           cursor: "pointer",
           objectFit: "cover", // Hace que la imagen se recorte para llenar el contenedor
-          width: "125px",
-          height: "125px",
+          width: "200px",
+          height: "200px",
         }} // Cambia el cursor para indicar que es clickeable
       />
       {imageSource.url && (
