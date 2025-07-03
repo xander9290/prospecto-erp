@@ -30,15 +30,15 @@ function ModalChangePassword({ show, onHide }: TModalProps) {
   } = useForm<TInputs>();
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
+    setLoading(true);
     if (data.newPassword !== data.confirmPassword) {
       setError("confirmPassword", {
         type: "manual",
         message: "Las contraseñas no coinciden",
       });
+      setLoading(false);
       return;
     }
-
-    setLoading(true);
 
     const res = await changeUserPassword(data);
 
@@ -48,6 +48,7 @@ function ModalChangePassword({ show, onHide }: TModalProps) {
         message: res.message,
       });
       setFocus("currentPassword");
+      setLoading(false);
       return;
     }
 
@@ -61,6 +62,7 @@ function ModalChangePassword({ show, onHide }: TModalProps) {
 
   const handleOnExited = () => {
     reset();
+    setLoading(false);
   };
 
   return (
