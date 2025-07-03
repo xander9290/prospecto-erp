@@ -16,6 +16,7 @@ import { updateUserProfile, userImageUpdate } from "@/app/actions/user-actions";
 import { formatDate } from "@/libs/helpers";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useState } from "react";
+import ModalChangePassword from "../modals/ModalChangePassword";
 
 type TInputs = {
   name: string;
@@ -27,6 +28,7 @@ function FormUserProfile({ user }: { user: User | null }) {
 
   const [block, setBlock] = useState(true);
   const [disabled, setDisabled] = useState(false);
+  const [modalChangePassword, setModalChangePassword] = useState(false);
 
   const {
     register,
@@ -70,25 +72,41 @@ function FormUserProfile({ user }: { user: User | null }) {
         <Form className="card mt-1" onSubmit={handleSubmit(onSubmit)}>
           <div className="card-header d-flex justify-content-between">
             <h5 className="card-title text-capitalize">{user?.Partner.name}</h5>
-            <fieldset className="d-flex gap-2" disabled={disabled}>
+            <fieldset className="d-flex gap-1" disabled={disabled}>
               <Button
                 onClick={() => setBlock(!block)}
                 size="sm"
-                variant="secondary"
+                variant="light"
+                title={block ? "Desbloquear" : "Bloquear"}
               >
-                {block ? "Desbloquear" : "Bloquear"}
+                {block ? (
+                  <i className="bi bi-unlock-fill"></i>
+                ) : (
+                  <i className="bi bi-lock-fill"></i>
+                )}
               </Button>
-              <Button type="submit" size="sm" disabled={!isDirty}>
-                Guardar
+              <Button
+                variant="light"
+                type="submit"
+                size="sm"
+                disabled={!isDirty}
+                title="Guardar"
+              >
+                <i className="bi bi-cloud-arrow-up-fill"></i>
               </Button>
               <DropdownButton
-                title={<i className="bi bi-gear"></i>}
+                title={<i className="bi bi-gear-fill"></i>}
                 size="sm"
                 className="text-capitalize"
                 variant="light"
               >
                 {user?.id === session?.user?.id && (
-                  <Dropdown.Item href="#">cambiar contraseña</Dropdown.Item>
+                  <Dropdown.Item
+                    href="#"
+                    onClick={() => setModalChangePassword(true)}
+                  >
+                    cambiar contraseña
+                  </Dropdown.Item>
                 )}
                 {user?.id !== session?.user?.id && (
                   <Dropdown.Item href="#">Seguir</Dropdown.Item>
@@ -156,6 +174,10 @@ function FormUserProfile({ user }: { user: User | null }) {
           </div>
         </Form>
       </Col>
+      <ModalChangePassword
+        show={modalChangePassword}
+        onHide={() => setModalChangePassword(false)}
+      />
     </Row>
   );
 }

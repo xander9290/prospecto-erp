@@ -307,3 +307,66 @@ export async function updateUserProfile({
     };
   }
 }
+
+export async function changeUserPassword({
+  currentPassword,
+  newPassword,
+}: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<ActionResponse<unknown>> {
+  try {
+    const session = await auth();
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: session?.user.id,
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        message: "Usuario no encontrado",
+      };
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isMatch) {
+      return {
+        success: false,
+        message: "Contraseña actual incorrecta",
+      };
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        password: hashedNewPassword,
+      },
+    });
+
+    if (!updatedUser) {
+      return {
+        success: false,
+        message: "Error al actualizar la contraseña",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Contraseña actualizada correctamente",
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      message: "Error al cambiar la contraseña",
+    };
+  }
+}
