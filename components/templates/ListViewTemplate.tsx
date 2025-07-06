@@ -9,7 +9,6 @@ type ListViewTemplateProps = {
   children?: React.ReactNode;
   viewForm: string;
   title: string;
-  search: (key: string | undefined) => void;
   basePath: string;
   page: number;
   perPage: number;
@@ -20,16 +19,11 @@ function ListViewTemplate({
   children,
   viewForm,
   title,
-  search,
   basePath,
   page = 1,
   perPage = 50,
   total = 0,
 }: ListViewTemplateProps) {
-  const handleSearch = (key: string | undefined) => {
-    return search(key ?? "");
-  };
-
   return (
     <Card className="h-100 d-flex flex-column">
       <Card.Header>
@@ -43,7 +37,7 @@ function ListViewTemplate({
             </div>
           </Col>
           <Col xs="12" md="3">
-            <FormSearchHeader search={handleSearch} />
+            <FormSearchHeader basePath={basePath} />
           </Col>
           <Col xs="12" md="4" className="d-flex justify-content-end">
             <SimplePagination

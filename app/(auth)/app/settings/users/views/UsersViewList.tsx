@@ -1,33 +1,40 @@
 "use client";
 
 import ListViewTemplate from "@/components/templates/ListViewTemplate";
+import { User } from "@/libs/definitions";
 
 function UserViewList({
   page,
   perPage,
   total,
+  users,
 }: {
   page: number;
   perPage: number;
   total: number;
+  users: User[];
 }) {
-  const handleSearch = (key: string | undefined) => {
-    console.log(key || "no hay busqueda");
-  };
   return (
     <ListViewTemplate
       title="usuarios"
-      viewForm="/app/settings/users?view_mode=form"
-      basePath="/app/settings/users?view_mode=list"
-      search={handleSearch}
+      viewForm="/app/settings/users?view_mode=form&id=null"
+      basePath="/app/settings/users?view_mode=list&page=1"
       page={page} // Default to page 1
       perPage={perPage} // Default to 50 items per page
       total={total} // Default to 0 total items
     >
       <div className="p-3">
-        <h1>Users List</h1>
-        {/* Add your user list content here */}
-        <p>This is where the user list will be displayed.</p>
+        {users.map((user) => (
+          <div key={user.id} className="mb-2">
+            <div className="d-flex justify-content-between align-items-center">
+              <span>{user.userName}</span>
+              <span>{user.email}</span>
+            </div>
+            <div className="text-muted small">
+              {user.Partner ? user.Partner.name : "No Partner"}
+            </div>
+          </div>
+        ))}
       </div>
     </ListViewTemplate>
   );

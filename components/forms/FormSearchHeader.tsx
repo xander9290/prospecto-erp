@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Button, Form } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
 
@@ -7,19 +8,16 @@ type TInputs = {
   searchKey: string;
 };
 
-function FormSearchHeader({ search }: { search: (key: string) => void }) {
+function FormSearchHeader({ basePath }: { basePath: string }) {
+  const route = useRouter();
   const { register, handleSubmit } = useForm<TInputs>();
 
   const onSubmit: SubmitHandler<TInputs> = (data) => {
-    if (search) {
-      search(data.searchKey);
-    }
-  };
-
-  const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (search) {
-      search(value);
+    const cleanedSearch = basePath.replace(/&?search=[^&]*/, ""); // Remove existing search param if any
+    if (data.searchKey) {
+      route.push(`${cleanedSearch}&search=${data.searchKey}`); // Update the URL with the new search value
+    } else {
+      route.push(cleanedSearch); // If searchKey is empty, just navigate to the base path
     }
   };
 
@@ -31,7 +29,7 @@ function FormSearchHeader({ search }: { search: (key: string) => void }) {
           size="sm"
           type="text"
           placeholder="Buscar..."
-          onChange={handleOnchange}
+          autoComplete="off"
         />
         <Button type="submit" size="sm" variant="info">
           <i className="bi bi-search"></i>
