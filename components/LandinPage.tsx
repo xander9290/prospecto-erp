@@ -24,7 +24,7 @@ export default function LandingPage() {
                   <Button variant="primary">Iniciar sesión</Button>
                 </Link>
                 <Link href="/auth/register">
-                  <Button variant="secondary">Solicitar acceso</Button>
+                  <Button variant="primary">Solicitar acceso</Button>
                 </Link>
               </div>
             </Card.Body>

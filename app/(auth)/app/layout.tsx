@@ -8,8 +8,12 @@ function LayoutApp({
 }>) {
   return (
     <SessionProvider>
-      <TopNav />
-      <main className="container vh-100">{children}</main>
+      <div className="d-flex flex-column vh-100">
+        <TopNav />
+        <main className="container-fluid flex-fill overflow-hidden">
+          {children}
+        </main>
+      </div>
     </SessionProvider>
   );
 }
