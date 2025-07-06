@@ -1,7 +1,14 @@
 "use client";
 
+import ListViewTable, {
+  ListItem,
+  ListItemLink,
+} from "@/components/templates/ListViewTable";
 import ListViewTemplate from "@/components/templates/ListViewTemplate";
 import { User } from "@/libs/definitions";
+import { formatDate } from "@/libs/helpers";
+import Link from "next/link";
+import { Dropdown, DropdownButton } from "react-bootstrap";
 
 function UserViewList({
   page,
@@ -23,19 +30,72 @@ function UserViewList({
       perPage={perPage} // Default to 50 items per page
       total={total} // Default to 0 total items
     >
-      <div className="p-3">
-        {users.map((user) => (
-          <div key={user.id} className="mb-2">
-            <div className="d-flex justify-content-between align-items-center">
-              <span>{user.userName}</span>
-              <span>{user.email}</span>
-            </div>
-            <div className="text-muted small">
-              {user.Partner ? user.Partner.name : "No Partner"}
-            </div>
-          </div>
-        ))}
-      </div>
+      <ListViewTable>
+        <ListViewTable.Header>
+          <ListViewTable.Column name="usersActions" className="text-center">
+            <i className="bi bi-gear-fill"></i>
+          </ListViewTable.Column>
+          <ListViewTable.Column name="userName">usuario</ListViewTable.Column>
+          <ListViewTable.Column name="Partner.name">
+            nombre
+          </ListViewTable.Column>
+          <ListViewTable.Column name="email">correo</ListViewTable.Column>
+          <ListViewTable.Column name="email">
+            último acceso
+          </ListViewTable.Column>
+          <ListViewTable.Column name="email">
+            última modificación
+          </ListViewTable.Column>
+          <ListViewTable.Column name="createdAt">
+            creado el
+          </ListViewTable.Column>
+        </ListViewTable.Header>
+        <ListViewTable.Content>
+          {users.map((user) => (
+            <ListItemLink
+              key={user.id}
+              path={`/app/settings/users?view_mode=form&id=${user.id}`}
+            >
+              <ListItem name="usersActions" className="text-center">
+                <DropdownButton
+                  variant="light"
+                  size="sm"
+                  title={<i className="bi bi-gear-fill"></i>}
+                  className="p-0"
+                >
+                  <Dropdown.Item
+                    as={Link}
+                    href={`/app/settings/users?view_mode=form&id=${user.id}`}
+                  >
+                    <i className="bi bi-pencil-square me-1"></i>
+                    Editar
+                  </Dropdown.Item>
+                  <Dropdown.Item as={"button"}>
+                    <i className="bi bi-archive-fill me-1"></i>
+                    Archivar
+                  </Dropdown.Item>
+                  <Dropdown.Item as={"button"}>
+                    <i className="bi bi-trash-fill me-1"></i>
+                    Eliminar
+                  </Dropdown.Item>
+                </DropdownButton>
+              </ListItem>
+              <ListItem name="userName">{user.userName}</ListItem>
+              <ListItem name="Partner.name">
+                {user.Partner ? user.Partner.name : "N/A"}
+              </ListItem>
+              <ListItem name="email">{user.email}</ListItem>
+              <ListItem name="updatedAt">
+                {user.updatedAt ? formatDate(user.updatedAt) : "N/A"}
+              </ListItem>
+              <ListItem name="lastLogin">
+                {user.lastLogin ? formatDate(user.lastLogin) : "N/A"}
+              </ListItem>
+              <ListItem name="createdAt">{formatDate(user.createdAt)}</ListItem>
+            </ListItemLink>
+          ))}
+        </ListViewTable.Content>
+      </ListViewTable>
     </ListViewTemplate>
   );
 }

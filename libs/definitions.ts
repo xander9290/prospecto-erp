@@ -8,6 +8,7 @@ export interface Partner {
   id: string;
   name: string;
   email: string | null;
+  createdById: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,6 +25,7 @@ export interface User {
   Request: Request | null;
   requestId: string | null;
   darkMode: boolean;
+  createdById: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

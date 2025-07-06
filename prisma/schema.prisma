@@ -9,30 +9,32 @@ datasource db {
 }
 
 model Partner {
-  id        String   @id @default(cuid())
-  name      String
-  email     String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  User      User?
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  User        User?
+  createdById String?  @default("") @map("created_by")
 
   @@map("partners")
 }
 
 model User {
-  id        String    @id @default(cuid())
-  password  String
-  lastLogin DateTime? @map("last_login")
-  partnerId String    @unique @map("partner_id")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  userName  String    @unique @map("user_name")
-  email     String    @unique
-  imageUrl  String?   @map("image_url")
-  Partner   Partner   @relation(fields: [partnerId], references: [id])
-  Request   Request?  @relation(fields: [requestId], references: [email])
-  requestId String?   @unique @map("resquest_id")
-  darkMode  Boolean   @default(false) @map("dark_mode")
+  id          String    @id @default(cuid())
+  password    String
+  lastLogin   DateTime? @map("last_login")
+  partnerId   String    @unique @map("partner_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  userName    String    @unique @map("user_name")
+  email       String    @unique
+  imageUrl    String?   @map("image_url")
+  Partner     Partner   @relation(fields: [partnerId], references: [id])
+  Request     Request?  @relation(fields: [requestId], references: [email])
+  requestId   String?   @unique @map("resquest_id")
+  darkMode    Boolean   @default(false) @map("dark_mode")
+  createdById String?   @default("") @map("created_by")
 
   @@index([partnerId, requestId])
   @@map("users")

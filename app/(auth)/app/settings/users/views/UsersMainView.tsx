@@ -18,7 +18,7 @@ async function PageUsersMainView({
   const p = page || 1;
   const perPage = 50;
 
-  const [users, total] = await Promise.all([
+  const [users] = await Promise.all([
     prisma.user.findMany({
       where: {
         OR: [
@@ -35,12 +35,16 @@ async function PageUsersMainView({
         Request: true,
       },
     }),
-    prisma.user.count(),
   ]);
 
   if (view_mode === "list") {
     return (
-      <UserViewList page={page} perPage={perPage} total={total} users={users} />
+      <UserViewList
+        page={page}
+        perPage={perPage}
+        total={users.length}
+        users={users}
+      />
     );
   } else if (view_mode === "form") {
     return <UserViewForm />;
