@@ -293,7 +293,7 @@ export async function updateUserProfile({
       };
     }
 
-    revalidatePath("/app/user");
+    revalidatePath("/app/profile");
 
     return {
       success: true,

@@ -47,7 +47,10 @@ function TopNav() {
             }
             className="text-capitalize"
           >
-            <NavDropdown.Item as={Link} href={`/app/user/${session?.user?.id}`}>
+            <NavDropdown.Item
+              as={Link}
+              href={`/app/profile/${session?.user?.id}`}
+            >
               mi perfil
             </NavDropdown.Item>
             <NavDropdown.Item onClick={() => signOut()} href="#">

@@ -159,18 +159,18 @@ function FormUserProfile({ user }: { user: User | null }) {
             </Row>
           </fieldset>
           <div className="card-footer d-flex justify-content-between align-items-center gap-2">
-            <span className="text-center">
+            <small>
               <strong>Creado el: </strong>
               {formatDate(user?.createdAt ?? "")}
-            </span>
-            <span className="text-center">
+            </small>
+            <small>
               <strong>Última conexión: </strong>
               {formatDate(user?.lastLogin ?? "")}
-            </span>
-            <span className="text-center">
+            </small>
+            <small>
               <strong>Última modificación: </strong>
               {formatDate(user?.updatedAt ?? "")}
-            </span>
+            </small>
           </div>
         </Form>
       </Col>
