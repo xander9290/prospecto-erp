@@ -1,8 +1,6 @@
 "use client";
 
-import { User } from "@/libs/definitions";
-
-function UserViewList({ users }: { users: User[] }) {
+function UserViewList() {
   return (
     <div>
       <h1>Pagina de usuarios</h1>
