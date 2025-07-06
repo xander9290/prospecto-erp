@@ -5,12 +5,13 @@ import UserViewForm from "./UsersViewForm";
 
 async function PageUsersMainView({
   view_mode,
+  page = 1, // Default to page 1 if not provided
 }: {
   page: number;
   view_mode: string;
 }) {
-  // const p = page;
-  // const perPage = 50;
+  const p = page;
+  const perPage = 50;
 
   // const [users, total] = await Promise.all([
   //   prisma.user.findMany({
@@ -26,7 +27,7 @@ async function PageUsersMainView({
   // ]);
 
   if (view_mode === "list") {
-    return <UserViewList />;
+    return <UserViewList page={p} perPage={perPage} total={1000} />;
   } else if (view_mode === "form") {
     return <UserViewForm />;
   } else {
