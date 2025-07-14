@@ -11,7 +11,14 @@ function ListViewTable({
   className?: string;
 }) {
   return (
-    <Table size="sm" className={className} bordered striped hover>
+    <Table
+      style={{ fontSize: "0.9rem" }}
+      size="sm"
+      className={className}
+      bordered
+      striped
+      hover
+    >
       {children}
     </Table>
   );
@@ -76,7 +83,7 @@ export function ListItem({
   name: string;
 }) {
   return (
-    <td title={name} className={`text-nowrap ${className}`}>
+    <td valign="middle" title={name} className={`text-nowrap ${className}`}>
       {children}
     </td>
   );

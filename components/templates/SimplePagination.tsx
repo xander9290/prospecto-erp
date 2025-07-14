@@ -19,18 +19,18 @@ function SimplePagination({
 
   return (
     <div className="d-flex gap-2 align-items-center">
-      <small className="bg-body-tertiary">
+      <small>
         {total} registros — Página {page} de {lastPage}
       </small>
       <Link
-        href={`${basePath}&page=${prevPage}`}
+        href={`${basePath.replace(/&?page=[^&]*/, "")}&page=${prevPage}`}
         className="btn btn-sm btn-primary"
         aria-disabled={page <= 1}
       >
         <i className="bi bi-caret-left-fill"></i>
       </Link>
       <Link
-        href={`${basePath}&page=${nextPage}`}
+        href={`${basePath.replace(/&?page=[^&]*/, "")}&page=${nextPage}`}
         className="btn btn-sm btn-primary"
         aria-disabled={page >= lastPage}
       >

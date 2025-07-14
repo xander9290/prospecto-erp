@@ -31,7 +31,7 @@ function FormSearchHeader({ basePath }: { basePath: string }) {
           placeholder="Buscar..."
           autoComplete="off"
         />
-        <Button type="submit" size="sm" variant="info">
+        <Button type="submit" size="sm" variant="primary">
           <i className="bi bi-search"></i>
         </Button>
       </Form.Group>

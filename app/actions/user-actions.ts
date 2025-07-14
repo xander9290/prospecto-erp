@@ -63,9 +63,12 @@ export async function createUser({
   name: string;
   email: string;
   userName: string;
-  password: string;
-}): Promise<ActionResponse<unknown>> {
+  password?: string;
+}): Promise<ActionResponse<string>> {
   try {
+    const session = await auth();
+    console.table({ name, userName, password, email });
+
     const emialExists = await prisma.user.findUnique({
       where: {
         email,
@@ -93,24 +96,16 @@ export async function createUser({
       };
     }
 
-    const findRequest = await prisma.request.findUnique({
-      where: {
-        email,
-      },
-    });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password || "1234", 10);
 
     const newUser = await prisma.user.create({
       data: {
         userName,
         email,
         password: hashedPassword,
+        createdById: session?.user.id || null,
         Partner: {
           connect: { id: newPartner.id },
-        },
-        Request: {
-          connect: { email: findRequest?.email ?? undefined },
         },
       },
     });
@@ -125,6 +120,7 @@ export async function createUser({
     return {
       success: true,
       message: "El usuario se ha creado",
+      data: newUser.id,
     };
   } catch (error: unknown) {
     console.error(error);
@@ -174,7 +170,6 @@ export async function fetchUser({
       },
       include: {
         Partner: true,
-        Request: true,
       },
     });
 

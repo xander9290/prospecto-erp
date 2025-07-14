@@ -1,3 +1,4 @@
+"use server";
 // lib/initAdmin.ts
 import bcrypt from "bcryptjs";
 import prisma from "./prisma";

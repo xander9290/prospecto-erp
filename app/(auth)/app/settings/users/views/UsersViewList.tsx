@@ -86,10 +86,10 @@ function UserViewList({
               </ListItem>
               <ListItem name="email">{user.email}</ListItem>
               <ListItem name="updatedAt">
-                {user.updatedAt ? formatDate(user.updatedAt) : "N/A"}
+                {user.lastLogin ? formatDate(user.lastLogin) : ""}
               </ListItem>
               <ListItem name="lastLogin">
-                {user.lastLogin ? formatDate(user.lastLogin) : "N/A"}
+                {user.updatedAt ? formatDate(user.updatedAt) : ""}
               </ListItem>
               <ListItem name="createdAt">{formatDate(user.createdAt)}</ListItem>
             </ListItemLink>

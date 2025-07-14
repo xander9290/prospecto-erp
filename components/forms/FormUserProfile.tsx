@@ -80,7 +80,6 @@ function FormUserProfile({ user }: { user: User | null }) {
                 <Button
                   onClick={() => setBlock(!block)}
                   size="sm"
-                  variant="light"
                   title={block ? "Desbloquear" : "Bloquear"}
                 >
                   {block ? (
@@ -90,7 +89,6 @@ function FormUserProfile({ user }: { user: User | null }) {
                   )}
                 </Button>
                 <Button
-                  variant="light"
                   type="submit"
                   size="sm"
                   disabled={!isDirty}
@@ -102,7 +100,6 @@ function FormUserProfile({ user }: { user: User | null }) {
                   title={<i className="bi bi-gear-fill"></i>}
                   size="sm"
                   className="text-capitalize"
-                  variant="light"
                 >
                   {user?.id === session?.user?.id && (
                     <Dropdown.Item

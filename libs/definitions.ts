@@ -4,6 +4,13 @@ export interface ActionResponse<T> {
   data?: T;
 }
 
+export interface ModalBasicProps {
+  show: boolean;
+  onHide?: () => void;
+  action?: () => void;
+  string?: string;
+}
+
 export interface Partner {
   id: string;
   name: string;
@@ -22,8 +29,6 @@ export interface User {
   lastLogin: Date | null;
   Partner: Partner;
   partnerId: string;
-  Request: Request | null;
-  requestId: string | null;
   darkMode: boolean;
   createdById: string | null;
   createdAt: Date;
