@@ -22,6 +22,7 @@ model Partner {
 
 model User {
   id          String    @id @default(cuid())
+  state       String    @default("no_active")
   password    String
   lastLogin   DateTime? @map("last_login")
   partnerId   String    @unique @map("partner_id")

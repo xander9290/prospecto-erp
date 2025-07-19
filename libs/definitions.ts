@@ -29,6 +29,7 @@ export interface User {
   lastLogin: Date | null;
   Partner: Partner;
   partnerId: string;
+  state: string;
   darkMode: boolean;
   createdById: string | null;
   createdAt: Date;

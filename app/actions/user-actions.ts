@@ -139,21 +139,34 @@ export async function loginUser({
   password: string;
 }): Promise<ActionResponse<unknown>> {
   try {
-    await signIn("credentials", {
+    const result = await signIn("credentials", {
       email: userName,
       password,
       redirect: false,
     });
+
+    const checkIsActive = await prisma.user.findUnique({
+      where: {
+        userName,
+      },
+    });
+
+    if (checkIsActive?.state === "no_active") {
+      return {
+        success: false,
+        message: result.error,
+      };
+    }
 
     return {
       success: true,
       message: "Se ha iniciado la sesión",
     };
   } catch (error: unknown) {
-    console.log(error);
+    console.error(error);
     return {
       success: false,
-      message: "Error al validar credenciales",
+      message: "Credenciales inválidas o el usuario está inhabilitado",
     };
   }
 }
@@ -362,6 +375,59 @@ export async function changeUserPassword({
     return {
       success: false,
       message: "Error al cambiar la contraseña",
+    };
+  }
+}
+
+export async function updateUser({
+  id,
+  userName,
+  name,
+  state,
+  email,
+}: {
+  id: string;
+  userName: string;
+  name: string;
+  state: string;
+  email: string;
+}): Promise<ActionResponse<unknown>> {
+  try {
+    const changedUser = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        userName,
+        email,
+        state,
+        Partner: {
+          update: {
+            name,
+            email,
+          },
+        },
+      },
+    });
+
+    if (!changedUser) {
+      return {
+        success: false,
+        message: "Error al editar usuario",
+      };
+    }
+
+    revalidatePath("/app/settings/users");
+
+    return {
+      success: true,
+      message: "Se ha editado el usuario",
+    };
+  } catch (error: unknown) {
+    console.error(error);
+    return {
+      success: false,
+      message: "Error al editar usuario @catch",
     };
   }
 }

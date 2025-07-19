@@ -23,6 +23,10 @@ export const authOptions = {
           throw new Error("Credenciales inválidas");
         }
 
+        if (user.state === "no_active") {
+          throw new Error("usuario no habilitado");
+        }
+
         const verifiedPassword = await bcrypt.compare(
           password as string,
           user.password

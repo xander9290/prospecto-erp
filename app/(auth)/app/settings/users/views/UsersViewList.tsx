@@ -1,5 +1,6 @@
 "use client";
 
+import { TFormState } from "@/components/templates/FormViewTemplate";
 import ListViewTable, {
   ListItem,
   ListItemLink,
@@ -9,6 +10,17 @@ import { User } from "@/libs/definitions";
 import { formatDate } from "@/libs/helpers";
 import Link from "next/link";
 import { Dropdown, DropdownButton } from "react-bootstrap";
+
+const formStates: TFormState[] = [
+  {
+    name: "no_active",
+    label: "inactivo",
+  },
+  {
+    name: "active",
+    label: "activo",
+  },
+];
 
 function UserViewList({
   page,
@@ -40,10 +52,11 @@ function UserViewList({
             nombre
           </ListViewTable.Column>
           <ListViewTable.Column name="email">correo</ListViewTable.Column>
-          <ListViewTable.Column name="email">
+          <ListViewTable.Column name="state">Estado</ListViewTable.Column>
+          <ListViewTable.Column name="lastLogin">
             último acceso
           </ListViewTable.Column>
-          <ListViewTable.Column name="email">
+          <ListViewTable.Column name="updatedAt">
             última modificación
           </ListViewTable.Column>
           <ListViewTable.Column name="createdAt">
@@ -85,6 +98,10 @@ function UserViewList({
                 {user.Partner ? user.Partner.name : "N/A"}
               </ListItem>
               <ListItem name="email">{user.email}</ListItem>
+              <ListItem name="state">
+                {formStates?.find((st) => st.name === user.state)?.label ||
+                  "estado"}
+              </ListItem>
               <ListItem name="updatedAt">
                 {user.lastLogin ? formatDate(user.lastLogin) : ""}
               </ListItem>

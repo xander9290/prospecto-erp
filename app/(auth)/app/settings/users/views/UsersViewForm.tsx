@@ -9,8 +9,9 @@ import { useEffect, useState } from "react";
 import { Form } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createUser, fetchUser } from "@/app/actions/user-actions";
+import { createUser, fetchUser, updateUser } from "@/app/actions/user-actions";
 import { useRouter } from "next/navigation";
+import Many2oneField from "@/components/Many2oneField";
 
 const formStates: TFormState[] = [
   {
@@ -48,7 +49,7 @@ function UserViewForm() {
     watch,
   } = useForm<TInputs>();
 
-  const [name] = watch(["name"]);
+  const [name, state] = watch(["name", "state"]);
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     if (modelId === "null") {
@@ -61,6 +62,21 @@ function UserViewForm() {
       }
       router.replace(`/app/settings/users?view_mode=form&id=${res.data}`);
     } else {
+      setDisabled(true);
+      const newData = {
+        ...data,
+        id: modelId || "",
+      };
+      const res = await updateUser(newData);
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
+
+      reset({
+        ...newData,
+      });
+      setDisabled(false);
     }
   };
 
@@ -80,10 +96,14 @@ function UserViewForm() {
       email: res.data?.email || "",
       name: res.data?.Partner.name || "",
       password: "", // si quieres dejarlo vacío
-      state: "",
+      state: res.data?.state,
       group: "",
     });
     setDisabled(false);
+  };
+
+  const getGroupId = (id: string | number) => {
+    console.log(id);
   };
 
   useEffect(() => {
@@ -107,7 +127,7 @@ function UserViewForm() {
       formActions={[]}
       formStates={formStates}
       name={name}
-      state={"active"}
+      state={state}
       onSubmit={handleSubmit(onSubmit)}
       disableForm={disabled}
       isDirty={!isDirty}
@@ -141,16 +161,17 @@ function UserViewForm() {
         </Form.Group>
         <Form.Group controlId="UserGroup" className="mb-3">
           <Form.Label>Grupo:</Form.Label>
-          <Form.Select
+          {/* <Form.Select
             {...register("group", { required: "Este campo es requerido" })}
             isInvalid={!!errors.group}
           >
             <option value=""></option>
             <option value="active">Activo</option>
-          </Form.Select>
-          <Form.Control.Feedback type="invalid">
+          </Form.Select> */}
+          {/* <Form.Control.Feedback type="invalid">
             {errors.group?.message}
-          </Form.Control.Feedback>
+          </Form.Control.Feedback> */}
+          <Many2oneField model="partner" onChange={getGroupId} />
         </Form.Group>
       </ViewGroup>
 
