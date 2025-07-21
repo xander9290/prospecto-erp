@@ -14,6 +14,7 @@ export interface ModalBasicProps {
 export interface Partner {
   id: string;
   name: string;
+  displayName: string;
   email: string | null;
   createdById: string | null;
   createdAt: Date;
@@ -23,6 +24,7 @@ export interface Partner {
 export interface User {
   id: string;
   userName: string;
+  displayName: string;
   password: string;
   email: string;
   imageUrl: string | null;

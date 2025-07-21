@@ -15,7 +15,6 @@ function ListViewTable({
       style={{ fontSize: "0.9rem" }}
       size="sm"
       className={className}
-      bordered
       striped
       hover
     >

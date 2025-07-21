@@ -47,6 +47,7 @@ function UserViewForm() {
     formState: { errors, isDirty },
     reset,
     watch,
+    control,
   } = useForm<TInputs>();
 
   const [name, state] = watch(["name", "state"]);
@@ -97,13 +98,9 @@ function UserViewForm() {
       name: res.data?.Partner.name || "",
       password: "", // si quieres dejarlo vacío
       state: res.data?.state,
-      group: "",
+      group: modelId || "",
     });
     setDisabled(false);
-  };
-
-  const getGroupId = (id: string | number) => {
-    console.log(id);
   };
 
   useEffect(() => {
@@ -161,17 +158,12 @@ function UserViewForm() {
         </Form.Group>
         <Form.Group controlId="UserGroup" className="mb-3">
           <Form.Label>Grupo:</Form.Label>
-          {/* <Form.Select
+          <Many2oneField<TInputs>
+            model="user"
             {...register("group", { required: "Este campo es requerido" })}
+            control={control}
             isInvalid={!!errors.group}
-          >
-            <option value=""></option>
-            <option value="active">Activo</option>
-          </Form.Select> */}
-          {/* <Form.Control.Feedback type="invalid">
-            {errors.group?.message}
-          </Form.Control.Feedback> */}
-          <Many2oneField model="partner" onChange={getGroupId} />
+          />
         </Form.Group>
       </ViewGroup>
 

@@ -49,7 +49,10 @@ function FormUserProfile({ user }: { user: User | null }) {
       position: "bottom-right",
     });
 
-    const res = await updateUserProfile(data);
+    const res = await updateUserProfile({
+      ...data,
+      userName: user?.userName || "",
+    });
 
     if (!res.success) {
       toast.error(res.message, { id: toastId });

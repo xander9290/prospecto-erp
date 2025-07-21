@@ -1,112 +1,177 @@
 "use client";
 
-import { many2oneSource } from "@/libs/many2one-source";
+import { useController, Control, FieldValues, Path } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
-import { Dropdown, Form, Spinner } from "react-bootstrap";
-
-type Many2oneFieldProps = {
-  model: string;
-  onChange?: (id: string | number) => void;
-};
+import { Button, Form, InputGroup, ListGroup, Spinner } from "react-bootstrap";
 
 type Record = { id: number | string; label: string };
 
-function Many2oneField({ model, onChange }: Many2oneFieldProps) {
-  const [records, setRecords] = useState<Record[]>([]);
+type Many2oneFieldProps<T extends FieldValues> = {
+  name: string;
+  control: Control<T>;
+  model: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+  isInvalid?: boolean;
+};
+
+function Many2oneField<T extends FieldValues>({
+  name,
+  control,
+  model,
+  disabled,
+  readOnly,
+  isInvalid,
+}: Many2oneFieldProps<T>) {
+  const {
+    field: { value, onChange },
+  } = useController({ name: name as Path<T>, control });
+
   const [label, setLabel] = useState("");
+  const [records, setRecords] = useState<Record[]>([]);
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLabel(e.target.value);
-    setShowDropdown(true);
-  };
+  const ref = useRef<HTMLDivElement>(null);
 
-  const handleSelect = (record: Record) => {
-    setLabel(record.label);
-    setShowDropdown(false);
-    onChange?.(record.id);
-  };
-
-  const fetchRecords = async () => {
-    if (!label || !model) {
-      setRecords([]);
-      return;
-    }
-
+  const fetchRecords = async (query: string) => {
+    if (!query || !model) return;
     setLoading(true);
     try {
-      const res = await many2oneSource({ model, label });
-      if (res.success) {
-        setRecords(res.data as Record[]);
+      const res = await fetch(
+        `/api/many2one/${model}?q=${encodeURIComponent(query)}`
+      );
+      const json = await res.json();
+      if (json.success) {
+        setRecords(json.data);
+        setShowDropdown(true);
       } else {
         setRecords([]);
+        setShowDropdown(false);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setRecords([]);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      fetchRecords();
-    }, 300);
+  const fetchRecommended = async () => {
+    if (!model) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/many2one/${model}`);
+      const json = await res.json();
+      if (json.success) {
+        setRecords(json.data);
+        setShowDropdown(true);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return () => clearTimeout(delayDebounce);
-  }, [label]);
+  const handleMouseEnter = () => {
+    if (label.trim() === "") {
+      fetchRecommended();
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    setLabel(input);
+    debounceFetch(input);
+    if (input === "") {
+      onChange(null); // Limpia el valor real (id)
+    }
+  };
+
+  const handleSelect = (record: Record) => {
+    setLabel(record.label);
+    onChange(record.id);
+    setShowDropdown(false);
+  };
+
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceFetch = (query: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchRecords(query), 300);
+  };
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
         setShowDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const fetchLabel = async () => {
+      if (!value) return;
+      try {
+        const res = await fetch(`/api/many2one/${model}?id=${value}`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          setLabel(json.data.label);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchLabel();
+  }, [value]);
+
   return (
-    <div ref={dropdownRef} style={{ position: "relative" }}>
-      <Form.Control
-        value={label}
-        onChange={handleChange}
-        placeholder="Buscar..."
-        autoComplete="off"
-      />
-
-      <Dropdown
-        show={showDropdown && records.length > 0}
-        style={{ width: "100%" }}
-      >
-        <Dropdown.Menu
-          show
-          style={{
-            width: "100%",
-            maxHeight: "200px",
-            overflowY: "auto",
-            borderTop: "none",
+    <div ref={ref} style={{ position: "relative" }}>
+      <InputGroup>
+        <Form.Control
+          value={label}
+          onChange={handleInputChange}
+          onClick={handleMouseEnter}
+          placeholder="Buscar..."
+          autoComplete="off"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.preventDefault();
           }}
+          disabled={disabled}
+          readOnly={readOnly}
+          isInvalid={isInvalid}
+        />
+        <Button
+          variant="outline-secondary"
+          type="button"
+          onClick={handleMouseEnter}
         >
-          {records.map((record) => (
-            <Dropdown.Item key={record.id} onClick={() => handleSelect(record)}>
-              {record.label}
-            </Dropdown.Item>
-          ))}
-        </Dropdown.Menu>
-      </Dropdown>
+          {loading ? (
+            <Spinner animation="border" size="sm" className="me-2" />
+          ) : (
+            <i className="bi bi-chevron-down"></i>
+          )}
+        </Button>
+      </InputGroup>
 
-      {loading && (
-        <div style={{ marginTop: 4, fontSize: "0.8rem", color: "#666" }}>
-          <Spinner animation="border" size="sm" className="me-2" />
-        </div>
+      {showDropdown && (
+        <ListGroup className="position-absolute w-100 z-3 shadow-sm bg-white mt-1">
+          {!loading && records.length === 0 && (
+            <ListGroup.Item>Sin resultados</ListGroup.Item>
+          )}
+          {!loading &&
+            records.map((opt) => (
+              <ListGroup.Item
+                key={opt.id}
+                action
+                onClick={() => handleSelect(opt)}
+              >
+                {opt.label}
+              </ListGroup.Item>
+            ))}
+        </ListGroup>
       )}
     </div>
   );

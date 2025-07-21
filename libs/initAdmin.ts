@@ -10,6 +10,7 @@ export async function initAdminUser() {
     const newPartner = await prisma.partner.create({
       data: {
         name: "Admin",
+        displayName: "admin",
       },
     });
 
@@ -19,6 +20,8 @@ export async function initAdminUser() {
       data: {
         userName: "Admin",
         email: "admin@example.com",
+        displayName: "[Admin] admin@example.com",
+        state: "active",
         password: hashedPassword,
         Partner: {
           connect: { id: newPartner.id },

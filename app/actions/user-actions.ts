@@ -82,10 +82,13 @@ export async function createUser({
       };
     }
 
+    const displayName: string = `${name}`;
+
     const newPartner = await prisma.partner.create({
       data: {
         name,
         email,
+        displayName,
       },
     });
 
@@ -104,6 +107,7 @@ export async function createUser({
         email,
         password: hashedPassword,
         createdById: session?.user.id || null,
+        displayName: `[${userName}] ${email}`,
         Partner: {
           connect: { id: newPartner.id },
         },
@@ -270,9 +274,11 @@ export async function setUserDarkMode(
 }
 
 export async function updateUserProfile({
+  userName,
   name,
   email,
 }: {
+  userName: string;
   name: string;
   email: string;
 }): Promise<ActionResponse<unknown>> {
@@ -285,6 +291,7 @@ export async function updateUserProfile({
       },
       data: {
         email,
+        displayName: `[${userName}] ${email}`,
         Partner: {
           update: {
             email,
@@ -401,6 +408,7 @@ export async function updateUser({
         userName,
         email,
         state,
+        displayName: `[${userName}] ${email}`,
         Partner: {
           update: {
             name,

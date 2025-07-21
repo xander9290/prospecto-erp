@@ -13,6 +13,7 @@ export async function many2oneSource({
   try {
     const allowedModels = {
       partner: prisma.partner,
+      user: prisma.user,
     };
 
     const client = allowedModels[model as keyof typeof allowedModels];
@@ -20,9 +21,10 @@ export async function many2oneSource({
       return { success: false, message: "Modelo no permitido" };
     }
 
+    //@ts-ignore
     const response = await client.findMany({
       where: {
-        name: {
+        displayName: {
           contains: label,
           mode: "insensitive",
         },
