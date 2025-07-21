@@ -9,7 +9,7 @@ import ListViewTemplate from "@/components/templates/ListViewTemplate";
 import { User } from "@/libs/definitions";
 import { formatDate } from "@/libs/helpers";
 import Link from "next/link";
-import { Dropdown, DropdownButton } from "react-bootstrap";
+import { Badge, Dropdown, DropdownButton } from "react-bootstrap";
 
 const formStates: TFormState[] = [
   {
@@ -94,13 +94,15 @@ function UserViewList({
                 </DropdownButton>
               </ListItem>
               <ListItem name="userName">{user.userName}</ListItem>
-              <ListItem name="Partner.name">
+              <ListItem name="Partner.name" avatar={user.imageUrl}>
                 {user.Partner ? user.Partner.name : "N/A"}
               </ListItem>
               <ListItem name="email">{user.email}</ListItem>
-              <ListItem name="state">
-                {formStates?.find((st) => st.name === user.state)?.label ||
-                  "estado"}
+              <ListItem name="state" className="text-capitalize">
+                <Badge bg={user.state === "no_active" ? "danger" : "success"}>
+                  {formStates?.find((st) => st.name === user.state)?.label ||
+                    "estado"}
+                </Badge>
               </ListItem>
               <ListItem name="updatedAt">
                 {user.lastLogin ? formatDate(user.lastLogin) : ""}
