@@ -6,33 +6,47 @@ import { Form } from "react-bootstrap";
 import toast from "react-hot-toast";
 import {
   createImage,
-  fetchImages,
+  fetchImage,
   removeImage,
 } from "@/app/actions/image-source-actions";
 
 type TImageProps = {
   entityType: string;
-  entityId: string | undefined;
-  getUrl?: (url: string) => void;
+  sourceId: string;
+  getImageId?: (url: string) => void;
+  remove?: boolean;
+  height: number;
+  width: number;
+  editable?: boolean;
 };
 
 type TImageSource = {
   url: string | null;
   publicId: string | null;
+  id: string | null;
 };
 
-function ImageSource({ entityType, entityId, getUrl }: TImageProps) {
+function ImageSource({
+  sourceId,
+  entityType,
+  getImageId,
+  remove,
+  width,
+  height,
+  editable,
+}: TImageProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [imageSource, setImageSource] = useState<TImageSource>({
     url: null,
     publicId: null,
+    id: null,
   });
 
   const handleRemoveImage = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     await removeImage({ publicId: imageSource.publicId });
-    setImageSource({ url: null, publicId: null });
+    setImageSource({ url: null, publicId: null, id: null });
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -50,16 +64,17 @@ function ImageSource({ entityType, entityId, getUrl }: TImageProps) {
       setImageSource({
         url: objectUrl,
         publicId: "",
+        id: "",
       });
       const formData = new FormData();
       formData.append("image", file);
-      const res = await createImage({ formData, entityType, entityId });
+      const res = await createImage({ formData, entityType });
       if (res.success) {
-        const { url, publicId } = res.data as TImageSource;
-        setImageSource({ url, publicId });
+        const { url, publicId, id } = res.data as TImageSource;
+        setImageSource({ url, publicId, id });
         toast.success(res.message, { id: toastId });
-        if (getUrl) {
-          getUrl(url ?? "");
+        if (getImageId) {
+          getImageId(id ?? "");
         }
       } else {
         toast.error(res.message, { id: toastId });
@@ -68,43 +83,54 @@ function ImageSource({ entityType, entityId, getUrl }: TImageProps) {
   };
 
   const getImages = async () => {
-    const res = await fetchImages({ entityType, entityId });
+    if (!sourceId) {
+      return {
+        success: false,
+        message: "",
+      };
+    }
+    const res = await fetchImage({ id: sourceId });
     if (!res.success) {
-      toast.error(res.message);
+      // toast.error(res.message);
       return;
     }
 
     if (res.data) {
-      const getImage = res.data[0];
+      const getImage = res.data;
       const url = getImage?.url ?? null;
       const publicId = getImage?.publicId ?? null;
+      const id = getImage.id;
 
-      setImageSource({ url, publicId });
+      setImageSource({ url, publicId, id });
     }
   };
 
   useEffect(() => {
     getImages();
-  }, [entityType, entityId]);
+  }, [entityType]);
 
   return (
-    <figure
+    <div
       role="button"
-      onClick={() => fileInputRef.current?.click()}
-      className="position-relative d-inline-block figure"
+      onClick={() => {
+        if (editable) {
+          fileInputRef.current?.click();
+        }
+      }}
+      className="position-relative d-inline-block"
     >
       <Image
         src={imageSource.url ?? "/image/avatar_default.svg"}
         alt="user_image"
-        className="figure-img img-fluid img-thumbnail rounded"
-        width={200}
-        height={200}
+        className="img-fluid rounded"
+        width={width}
+        height={height}
         unoptimized
         style={{
           cursor: "pointer",
           objectFit: "cover", // Hace que la imagen se recorte para llenar el contenedor
-          width: "200px",
-          height: "200px",
+          width: `${width}px`,
+          height: `${height}px`,
         }} // Cambia el cursor para indicar que es clickeable
       />
       {imageSource.url && (
@@ -115,10 +141,10 @@ function ImageSource({ entityType, entityId, getUrl }: TImageProps) {
           style={{
             top: "-8px",
             right: "-8px",
-            width: "24px",
-            height: "24px",
+            width: `25px`,
+            height: `25px`,
             padding: 0,
-            display: "flex",
+            display: !remove ? "none" : "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: "0.75rem",
@@ -134,7 +160,7 @@ function ImageSource({ entityType, entityId, getUrl }: TImageProps) {
         onChange={handleImage}
         className="d-none" // Oculta el input
       />
-    </figure>
+    </div>
   );
 }
 

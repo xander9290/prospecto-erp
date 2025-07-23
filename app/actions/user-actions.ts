@@ -85,20 +85,20 @@ export async function createUser({
 
     const displayName: string = `${name}`;
 
-    const newPartner = await prisma.partner.create({
-      data: {
-        name,
-        email,
-        displayName,
-      },
-    });
+    // const newPartner = await prisma.partner.create({
+    //   data: {
+    //     name,
+    //     email,
+    //     displayName,
+    //   },
+    // });
 
-    if (!newPartner) {
-      return {
-        success: false,
-        message: "Error al crear Partner",
-      };
-    }
+    // if (!newPartner) {
+    //   return {
+    //     success: false,
+    //     message: "Error al crear Partner",
+    //   };
+    // }
 
     const hashedPassword = await bcrypt.hash(password || "1234", 10);
 
@@ -108,9 +108,13 @@ export async function createUser({
         email,
         password: hashedPassword,
         createdById: session?.user.id || null,
-        displayName: `[${userName}] ${email}`,
+        displayName: `${userName} - ${email}`,
         Partner: {
-          connect: { id: newPartner.id },
+          create: {
+            name,
+            displayName,
+            createdById: session?.user.id,
+          },
         },
       },
     });
@@ -216,18 +220,24 @@ export async function fetchUser({
   }
 }
 
-export async function userImageUpdate(
-  url: string
-): Promise<ActionResponse<unknown>> {
+export async function userImageUpdate({
+  imageId,
+  id,
+}: {
+  imageId: string;
+  id: string;
+}): Promise<ActionResponse<unknown>> {
   try {
-    const session = await auth();
-
     const changedUser = await prisma.user.update({
       where: {
-        id: session?.user?.id,
+        id,
       },
       data: {
-        imageUrl: url,
+        Partner: {
+          update: {
+            imageId,
+          },
+        },
       },
     });
 
@@ -413,7 +423,7 @@ export async function updateUser({
         userName,
         email,
         state,
-        displayName: `[${userName}] ${email}`,
+        displayName: `${userName} - ${email}`,
         Partner: {
           update: {
             name,

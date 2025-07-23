@@ -1,6 +1,5 @@
 "use client";
 
-import { User } from "@/libs/definitions";
 import { useSession } from "next-auth/react";
 import {
   Button,
@@ -18,13 +17,18 @@ import { formatDate } from "@/libs/helpers";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import ModalChangePassword from "../modals/ModalChangePassword";
+import { Partner, User } from "@/generate/prisma";
 
 type TInputs = {
   name: string;
   email: string;
 };
 
-function FormUserProfile({ user }: { user: User | null }) {
+type UserWithPartner = User & {
+  Partner: Partner;
+};
+
+function FormUserProfile({ user }: { user: UserWithPartner | null }) {
   const { data: session } = useSession();
 
   const [block, setBlock] = useState(true);
@@ -65,9 +69,9 @@ function FormUserProfile({ user }: { user: User | null }) {
     setBlock(true);
   };
 
-  const handleImageUrl = async (url: string) => {
-    if (!url) return;
-    await userImageUpdate(url);
+  const handleImageId = async (imageId: string) => {
+    if (!imageId) return;
+    await userImageUpdate({ id: session?.user.id, imageId });
   };
 
   return (
@@ -123,8 +127,12 @@ function FormUserProfile({ user }: { user: User | null }) {
                 <Col md="3" className="text-center">
                   <ImageSource
                     entityType="users"
-                    entityId={session?.user?.id}
-                    getUrl={handleImageUrl}
+                    sourceId={user?.Partner.imageId || ""}
+                    getImageId={handleImageId}
+                    width={200}
+                    height={200}
+                    editable
+                    remove
                   />
                 </Col>
                 <Col md="9">
