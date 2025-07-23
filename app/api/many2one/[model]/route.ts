@@ -25,7 +25,7 @@ export async function GET(
     );
   }
 
-  // Modo precarga por ID
+  // 🔍 Carga por ID
   if (id) {
     try {
       //@ts-expect-error modelos mixtos
@@ -40,9 +40,10 @@ export async function GET(
         });
       }
 
+      // Devuelve TODO el registro
       return NextResponse.json({
         success: true,
-        data: { id: record.id, label: record.displayName },
+        data: { ...record, label: record.displayName },
       });
     } catch (error) {
       console.error(error);
@@ -57,7 +58,6 @@ export async function GET(
     let results;
 
     if (query) {
-      // Búsqueda por texto (modo filtrado)
       //@ts-expect-error modelos mixtos
       results = await db.findMany({
         where: {
@@ -70,7 +70,6 @@ export async function GET(
         orderBy: { id: "desc" },
       });
     } else {
-      // Modo sugerencias por default
       //@ts-expect-error modelos mixtos
       results = await db.findMany({
         take: 8,
@@ -78,14 +77,14 @@ export async function GET(
       });
     }
 
-    const data = results.map(
-      (r: { id: number | string; displayName: string }) => ({
-        id: r.id,
-        label: r.displayName,
-      })
-    );
+    // Agrega label a cada objeto
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const withLabel = results.map((r: any) => ({
+      ...r,
+      label: r.displayName,
+    }));
 
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true, data: withLabel });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

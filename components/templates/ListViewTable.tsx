@@ -12,13 +12,7 @@ function ListViewTable({
   className?: string;
 }) {
   return (
-    <Table
-      style={{ fontSize: "0.9rem" }}
-      size="sm"
-      className={className}
-      striped
-      hover
-    >
+    <Table className={className} striped hover>
       {children}
     </Table>
   );
@@ -86,22 +80,22 @@ export function ListItem({
 }) {
   return (
     <td valign="middle" title={name} className={`text-nowrap ${className}`}>
-      <div className="d-flex align-items-end">
+      <div>
         {avatar && (
           <Image
-            width={25}
-            height={25}
+            width={30}
+            height={30}
             src={avatar || "/image/avatar_default.svg"}
             alt="UserImage"
             className="rounded me-1"
             unoptimized
             style={{
-              width: "25px",
-              height: "25px",
+              width: "30px",
+              height: "30px",
             }}
           />
         )}
-        {children}
+        <span>{children}</span>
       </div>
     </td>
   );

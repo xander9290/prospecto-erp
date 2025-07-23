@@ -4,7 +4,11 @@ import { useController, Control, FieldValues, Path } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import { Button, Form, InputGroup, ListGroup, Spinner } from "react-bootstrap";
 
-type Record = { id: number | string; label: string };
+type Record = {
+  id: number | string;
+  label: string;
+  [key: string]: unknown; // resto de propiedades
+};
 
 type Many2oneFieldProps<T extends FieldValues> = {
   name: string;
@@ -13,6 +17,7 @@ type Many2oneFieldProps<T extends FieldValues> = {
   disabled?: boolean;
   readOnly?: boolean;
   isInvalid?: boolean;
+  invisible?: boolean;
 };
 
 function Many2oneField<T extends FieldValues>({
@@ -22,6 +27,7 @@ function Many2oneField<T extends FieldValues>({
   disabled,
   readOnly,
   isInvalid,
+  invisible,
 }: Many2oneFieldProps<T>) {
   const {
     field: { value, onChange },
@@ -85,13 +91,13 @@ function Many2oneField<T extends FieldValues>({
     setLabel(input);
     debounceFetch(input);
     if (input === "") {
-      onChange(null); // Limpia el valor real (id)
+      onChange(null);
     }
   };
 
   const handleSelect = (record: Record) => {
     setLabel(record.label);
-    onChange(record.id);
+    onChange(record); // Guarda el objeto completo
     setShowDropdown(false);
   };
 
@@ -112,29 +118,39 @@ function Many2oneField<T extends FieldValues>({
   }, []);
 
   useEffect(() => {
-    const fetchLabel = async () => {
-      if (!value) return;
-      try {
-        const res = await fetch(`/api/many2one/${model}?id=${value}`);
-        const json = await res.json();
-        if (json.success && json.data) {
-          setLabel(json.data.label);
+    if (value == null) {
+      setLabel("");
+      return;
+    }
+    if (value && typeof value === "object" && "label" in value) {
+      setLabel(value.label);
+    } else if (value) {
+      const fetchLabel = async () => {
+        try {
+          const res = await fetch(`/api/many2one/${model}?id=${value}`);
+          const json = await res.json();
+          if (json.success && json.data) {
+            setLabel(json.data.label);
+            onChange(json.data); // Reemplaza el ID por el objeto completo
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchLabel();
+      };
+      fetchLabel();
+    }
   }, [value]);
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
+    <div
+      ref={ref}
+      style={{ position: "relative", display: invisible ? "none" : "inline" }}
+    >
       <InputGroup>
         <Form.Control
           value={label}
           onChange={handleInputChange}
           onClick={handleMouseEnter}
-          placeholder="Buscar..."
           autoComplete="off"
           onKeyDown={(e) => {
             if (e.key === "Enter") e.preventDefault();
@@ -147,6 +163,7 @@ function Many2oneField<T extends FieldValues>({
           variant="outline-secondary"
           type="button"
           onClick={handleMouseEnter}
+          disabled={disabled}
         >
           {loading ? (
             <Spinner animation="border" size="sm" className="me-2" />

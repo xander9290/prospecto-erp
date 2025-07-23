@@ -12,6 +12,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { createUser, fetchUser, updateUser } from "@/app/actions/user-actions";
 import { useRouter } from "next/navigation";
 import Many2oneField from "@/components/Many2oneField";
+import { User } from "@/generate/prisma";
 
 const formStates: TFormState[] = [
   {
@@ -31,6 +32,7 @@ type TInputs = {
   name: string;
   state: string;
   group: string;
+  createdById: string | null;
 };
 
 function UserViewForm() {
@@ -48,9 +50,10 @@ function UserViewForm() {
     reset,
     watch,
     control,
+    setValue,
   } = useForm<TInputs>();
 
-  const [name, state] = watch(["name", "state"]);
+  const [name, state, group] = watch(["name", "state", "group"]);
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     if (modelId === "null") {
@@ -117,6 +120,15 @@ function UserViewForm() {
       });
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (group) {
+      const getGroup = group as unknown as User;
+      setValue("createdById", getGroup.createdById);
+    } else {
+      setValue("createdById", null);
+    }
+  }, [group]);
 
   return (
     <FormViewTemplate
@@ -186,6 +198,15 @@ function UserViewForm() {
             {...register("email")}
             type="email"
             autoComplete="off"
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Creado por:</Form.Label>
+          <Many2oneField
+            {...register("createdById")}
+            model="user"
+            control={control}
+            disabled
           />
         </Form.Group>
       </ViewGroup>

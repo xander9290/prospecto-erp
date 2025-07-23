@@ -1,7 +1,8 @@
 "use server";
 
+import { Partner, User } from "@/generate/prisma";
 import { auth, signIn } from "@/libs/auth";
-import { ActionResponse, User } from "@/libs/definitions";
+import { ActionResponse } from "@/libs/definitions";
 import prisma from "@/libs/prisma";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
@@ -175,11 +176,15 @@ export async function loginUser({
   }
 }
 
+type UserWithPartner = User & {
+  Partner: Partner;
+};
+
 export async function fetchUser({
   id,
 }: {
   id: string;
-}): Promise<ActionResponse<User>> {
+}): Promise<ActionResponse<UserWithPartner>> {
   try {
     const user = await prisma.user.findUnique({
       where: {
