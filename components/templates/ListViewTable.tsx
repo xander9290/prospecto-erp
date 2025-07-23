@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { Table } from "react-bootstrap";
-import Image from "next/image";
 import ImageSource from "../ImageSource";
 
 function ListViewTable({
