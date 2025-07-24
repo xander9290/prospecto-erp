@@ -1,8 +1,7 @@
 "use server";
 
-import { Partner, User } from "@/generate/prisma";
 import { auth, signIn } from "@/libs/auth";
-import { ActionResponse } from "@/libs/definitions";
+import { ActionResponse, UserWithPartner } from "@/libs/definitions";
 import prisma from "@/libs/prisma";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
@@ -68,7 +67,6 @@ export async function createUser({
 }): Promise<ActionResponse<string>> {
   try {
     const session = await auth();
-    console.table({ name, userName, password, email });
 
     const emialExists = await prisma.user.findUnique({
       where: {
@@ -83,43 +81,30 @@ export async function createUser({
       };
     }
 
-    const displayName: string = `${name}`;
-
-    // const newPartner = await prisma.partner.create({
-    //   data: {
-    //     name,
-    //     email,
-    //     displayName,
-    //   },
-    // });
-
-    // if (!newPartner) {
-    //   return {
-    //     success: false,
-    //     message: "Error al crear Partner",
-    //   };
-    // }
-
     const hashedPassword = await bcrypt.hash(password || "1234", 10);
 
-    const newUser = await prisma.user.create({
+    const newPartner = await prisma.partner.create({
       data: {
-        userName,
+        name,
         email,
-        password: hashedPassword,
-        createdById: session?.user.id || null,
-        displayName: `${userName} - ${email}`,
-        Partner: {
+        displayName: name,
+        createdById: session?.user.id,
+        User: {
           create: {
-            name,
-            displayName,
+            userName,
+            email,
+            password: hashedPassword,
+            displayName: `${name} - ${email}`,
             createdById: session?.user.id,
           },
         },
       },
+      include: {
+        User: true,
+      },
     });
 
-    if (!newUser) {
+    if (!newPartner) {
       return {
         success: false,
         message: "Error al crear usuario",
@@ -129,7 +114,7 @@ export async function createUser({
     return {
       success: true,
       message: "El usuario se ha creado",
-      data: newUser.id,
+      data: newPartner.User?.id,
     };
   } catch (error: unknown) {
     console.error(error);
@@ -180,10 +165,6 @@ export async function loginUser({
   }
 }
 
-type UserWithPartner = User & {
-  Partner: Partner;
-};
-
 export async function fetchUser({
   id,
 }: {
@@ -195,7 +176,12 @@ export async function fetchUser({
         id,
       },
       include: {
-        Partner: true,
+        Partner: {
+          include: {
+            Image: true,
+            CreateUid: true,
+          },
+        },
       },
     });
 
@@ -247,6 +233,8 @@ export async function userImageUpdate({
         message: "Error al actualizar la url de la imagen",
       };
     }
+
+    revalidatePath("/app/settings/users");
 
     return {
       success: true,

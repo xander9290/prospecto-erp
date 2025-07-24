@@ -23,16 +23,18 @@ model Partner {
   province     String?
 
   // propiedades de modelo
-  state   String?
-  imageId String? @map("image_id")
+  state String?
 
   // relaciones
   User User?
 
+  imageId String? @unique @map("image_id")
+  Image   Image?  @relation("EntityImage", fields: [imageId], references: [id])
+
   userId String? @map("user_id")
   UserId User?   @relation("AgentUser", fields: [userId], references: [id])
 
-  createdById String? @default("") @map("created_by")
+  createdById String? @map("created_by")
   CreateUid   User?   @relation("CreateUid", fields: [createdById], references: [id])
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -55,7 +57,7 @@ model User {
   email       String    @unique
   Partner     Partner   @relation(fields: [partnerId], references: [id])
   darkMode    Boolean   @default(false) @map("dark_mode")
-  createdById String?   @default("") @map("created_by")
+  createdById String?   @map("created_by")
 
   Partners     Partner[] @relation("CreateUid")
   PartnerLeads Partner[] @relation("AgentUser")
@@ -68,8 +70,9 @@ model Image {
   id         String  @id @default(cuid())
   url        String
   publicId   String  @map("public_id")
-  entityId   String?
   entityType String?
+
+  Partner Partner? @relation("EntityImage")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

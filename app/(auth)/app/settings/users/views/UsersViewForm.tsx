@@ -3,16 +3,21 @@
 import FormViewTemplate, {
   TFormState,
   ViewGroup,
+  ViewGroupFluid,
 } from "@/components/templates/FormViewTemplate";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Form } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createUser, fetchUser, updateUser } from "@/app/actions/user-actions";
+import {
+  createUser,
+  fetchUser,
+  updateUser,
+  userImageUpdate,
+} from "@/app/actions/user-actions";
 import { useRouter } from "next/navigation";
-import Many2oneField from "@/components/Many2oneField";
-import { User } from "@/generate/prisma";
+import ImageSource from "@/components/ImageSource";
 
 const formStates: TFormState[] = [
   {
@@ -31,8 +36,7 @@ type TInputs = {
   email: string;
   name: string;
   state: string;
-  group: string;
-  createdById: string | null;
+  imageId: string | null;
 };
 
 function UserViewForm() {
@@ -49,11 +53,9 @@ function UserViewForm() {
     formState: { errors, isDirty },
     reset,
     watch,
-    control,
-    setValue,
   } = useForm<TInputs>();
 
-  const [name, state, group] = watch(["name", "state", "group"]);
+  const [name, state, imageId] = watch(["name", "state", "imageId"]);
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     if (modelId === "null") {
@@ -101,9 +103,14 @@ function UserViewForm() {
       name: res.data?.Partner.name || "",
       password: "", // si quieres dejarlo vacío
       state: res.data?.state,
-      group: modelId || "",
+      imageId: res.data?.Partner.imageId || null,
     });
     setDisabled(false);
+  };
+
+  const handleImageId = async (imageId: string) => {
+    if (!imageId) return;
+    await userImageUpdate({ id: modelId || "", imageId });
   };
 
   useEffect(() => {
@@ -113,22 +120,13 @@ function UserViewForm() {
       reset({
         userName: "",
         state: "",
-        group: "",
         name: "",
         password: "",
         email: "",
+        imageId: null,
       });
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    if (group) {
-      const getGroup = group as unknown as User;
-      setValue("createdById", getGroup.createdById);
-    } else {
-      setValue("createdById", null);
-    }
-  }, [group]);
 
   return (
     <FormViewTemplate
@@ -141,6 +139,17 @@ function UserViewForm() {
       disableForm={disabled}
       isDirty={!isDirty}
     >
+      <ViewGroupFluid classname="d-flex justify-content-end">
+        <ImageSource
+          entityType="users"
+          sourceId={imageId}
+          width={125}
+          height={125}
+          editable={true}
+          remove={true}
+          getImageId={handleImageId}
+        />
+      </ViewGroupFluid>
       <ViewGroup>
         <Form.Group controlId="UserUserName" className="mb-3">
           <Form.Label>Usuario:</Form.Label>
@@ -168,7 +177,7 @@ function UserViewForm() {
             {errors.state?.message}
           </Form.Control.Feedback>
         </Form.Group>
-        <Form.Group controlId="UserGroup" className="mb-3">
+        {/* <Form.Group controlId="UserGroup" className="mb-3">
           <Form.Label>Grupo:</Form.Label>
           <Many2oneField<TInputs>
             model="user"
@@ -176,7 +185,7 @@ function UserViewForm() {
             control={control}
             isInvalid={!!errors.group}
           />
-        </Form.Group>
+        </Form.Group> */}
       </ViewGroup>
 
       <ViewGroup>
@@ -200,7 +209,7 @@ function UserViewForm() {
             autoComplete="off"
           />
         </Form.Group>
-        <Form.Group>
+        {/* <Form.Group>
           <Form.Label>Creado por:</Form.Label>
           <Many2oneField
             {...register("createdById")}
@@ -208,7 +217,7 @@ function UserViewForm() {
             control={control}
             disabled
           />
-        </Form.Group>
+        </Form.Group> */}
       </ViewGroup>
     </FormViewTemplate>
   );

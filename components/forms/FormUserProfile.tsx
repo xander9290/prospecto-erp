@@ -17,15 +17,11 @@ import { formatDate } from "@/libs/helpers";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import ModalChangePassword from "../modals/ModalChangePassword";
-import { Partner, User } from "@/generate/prisma";
+import { UserWithPartner } from "@/libs/definitions";
 
 type TInputs = {
   name: string;
   email: string;
-};
-
-type UserWithPartner = User & {
-  Partner: Partner;
 };
 
 function FormUserProfile({ user }: { user: UserWithPartner | null }) {

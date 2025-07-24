@@ -12,7 +12,7 @@ import {
 
 type TImageProps = {
   entityType: string;
-  sourceId: string;
+  sourceId: string | null;
   getImageId?: (url: string) => void;
   remove?: boolean;
   height: number;
@@ -107,7 +107,7 @@ function ImageSource({
 
   useEffect(() => {
     getImages();
-  }, [entityType]);
+  }, [sourceId]);
 
   return (
     <div
