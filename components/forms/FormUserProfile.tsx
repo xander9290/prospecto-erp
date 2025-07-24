@@ -1,6 +1,5 @@
 "use client";
 
-import { User } from "@/libs/definitions";
 import { useSession } from "next-auth/react";
 import {
   Button,
@@ -18,13 +17,14 @@ import { formatDate } from "@/libs/helpers";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import ModalChangePassword from "../modals/ModalChangePassword";
+import { UserWithPartner } from "@/libs/definitions";
 
 type TInputs = {
   name: string;
   email: string;
 };
 
-function FormUserProfile({ user }: { user: User | null }) {
+function FormUserProfile({ user }: { user: UserWithPartner | null }) {
   const { data: session } = useSession();
 
   const [block, setBlock] = useState(true);
@@ -67,7 +67,7 @@ function FormUserProfile({ user }: { user: User | null }) {
 
   const handleImageUrl = async (url: string) => {
     if (!url) return;
-    await userImageUpdate(url);
+    await userImageUpdate({ userId: user?.id || "", imageUrl: url });
   };
 
   return (

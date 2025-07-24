@@ -12,7 +12,6 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { createUser, fetchUser, updateUser } from "@/app/actions/user-actions";
 import { useRouter } from "next/navigation";
 import Many2oneField from "@/components/Many2oneField";
-import { User } from "@/generate/prisma";
 
 const formStates: TFormState[] = [
   {
@@ -31,7 +30,6 @@ type TInputs = {
   email: string;
   name: string;
   state: string;
-  group: string;
   createdById: string | null;
 };
 
@@ -50,10 +48,9 @@ function UserViewForm() {
     reset,
     watch,
     control,
-    setValue,
   } = useForm<TInputs>();
 
-  const [name, state, group] = watch(["name", "state", "group"]);
+  const [name, state] = watch(["name", "state"]);
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     if (modelId === "null") {
@@ -101,7 +98,7 @@ function UserViewForm() {
       name: res.data?.Partner.name || "",
       password: "", // si quieres dejarlo vacío
       state: res.data?.state,
-      group: modelId || "",
+      createdById: res.data?.createdById || "",
     });
     setDisabled(false);
   };
@@ -113,22 +110,13 @@ function UserViewForm() {
       reset({
         userName: "",
         state: "",
-        group: "",
         name: "",
         password: "",
         email: "",
+        createdById: null,
       });
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    if (group) {
-      const getGroup = group as unknown as User;
-      setValue("createdById", getGroup.createdById);
-    } else {
-      setValue("createdById", null);
-    }
-  }, [group]);
 
   return (
     <FormViewTemplate
@@ -149,13 +137,14 @@ function UserViewForm() {
             type="text"
             isInvalid={!!errors.userName}
             autoComplete="off"
+            size="sm"
           />
           <Form.Control.Feedback type="invalid">
             {errors.userName?.message}
           </Form.Control.Feedback>
         </Form.Group>
         <Form.Group controlId="UserState" className="mb-3">
-          <Form.Label>Estado:</Form.Label>
+          <Form.Label size="sm">Estado:</Form.Label>
           <Form.Select
             {...register("state", { required: "Este campo es requerido" })}
             isInvalid={!!errors.state}
@@ -168,7 +157,7 @@ function UserViewForm() {
             {errors.state?.message}
           </Form.Control.Feedback>
         </Form.Group>
-        <Form.Group controlId="UserGroup" className="mb-3">
+        {/* <Form.Group controlId="UserGroup" className="mb-3">
           <Form.Label>Grupo:</Form.Label>
           <Many2oneField<TInputs>
             model="user"
@@ -176,7 +165,7 @@ function UserViewForm() {
             control={control}
             isInvalid={!!errors.group}
           />
-        </Form.Group>
+        </Form.Group> */}
       </ViewGroup>
 
       <ViewGroup>
@@ -187,6 +176,7 @@ function UserViewForm() {
             type="text"
             autoComplete="off"
             isInvalid={!!errors.name}
+            size="sm"
           />
           <Form.Control.Feedback type="invalid">
             {errors.name?.message}
@@ -198,6 +188,7 @@ function UserViewForm() {
             {...register("email")}
             type="email"
             autoComplete="off"
+            size="sm"
           />
         </Form.Group>
         <Form.Group>

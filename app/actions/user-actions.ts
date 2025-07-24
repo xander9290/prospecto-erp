@@ -1,8 +1,7 @@
 "use server";
 
-import { Partner, User } from "@/generate/prisma";
 import { auth, signIn } from "@/libs/auth";
-import { ActionResponse } from "@/libs/definitions";
+import { ActionResponse, UserWithPartner } from "@/libs/definitions";
 import prisma from "@/libs/prisma";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
@@ -83,39 +82,30 @@ export async function createUser({
       };
     }
 
-    const displayName: string = `${name}`;
+    const hashedPassword = await bcrypt.hash(password || "f1r5t", 10);
 
     const newPartner = await prisma.partner.create({
       data: {
         name,
         email,
-        displayName,
+        displayName: name,
+        createdById: session?.user.id,
+        User: {
+          create: {
+            userName,
+            email,
+            createdById: session?.user.id,
+            displayName: name,
+            password: hashedPassword,
+          },
+        },
+      },
+      include: {
+        User: true,
       },
     });
 
     if (!newPartner) {
-      return {
-        success: false,
-        message: "Error al crear Partner",
-      };
-    }
-
-    const hashedPassword = await bcrypt.hash(password || "1234", 10);
-
-    const newUser = await prisma.user.create({
-      data: {
-        userName,
-        email,
-        password: hashedPassword,
-        createdById: session?.user.id || null,
-        displayName: `[${userName}] ${email}`,
-        Partner: {
-          connect: { id: newPartner.id },
-        },
-      },
-    });
-
-    if (!newUser) {
       return {
         success: false,
         message: "Error al crear usuario",
@@ -125,7 +115,7 @@ export async function createUser({
     return {
       success: true,
       message: "El usuario se ha creado",
-      data: newUser.id,
+      data: newPartner.User?.id,
     };
   } catch (error: unknown) {
     console.error(error);
@@ -176,10 +166,6 @@ export async function loginUser({
   }
 }
 
-type UserWithPartner = User & {
-  Partner: Partner;
-};
-
 export async function fetchUser({
   id,
 }: {
@@ -192,6 +178,7 @@ export async function fetchUser({
       },
       include: {
         Partner: true,
+        CUser: true,
       },
     });
 
@@ -216,18 +203,24 @@ export async function fetchUser({
   }
 }
 
-export async function userImageUpdate(
-  url: string
-): Promise<ActionResponse<unknown>> {
+export async function userImageUpdate({
+  imageUrl,
+  userId,
+}: {
+  imageUrl: string;
+  userId: string;
+}): Promise<ActionResponse<unknown>> {
   try {
-    const session = await auth();
-
     const changedUser = await prisma.user.update({
       where: {
-        id: session?.user?.id,
+        id: userId,
       },
       data: {
-        imageUrl: url,
+        Partner: {
+          update: {
+            imageUrl,
+          },
+        },
       },
     });
 
@@ -331,16 +324,16 @@ export async function updateUserProfile({
 export async function changeUserPassword({
   currentPassword,
   newPassword,
+  id,
 }: {
   currentPassword: string;
   newPassword: string;
+  id: string | null;
 }): Promise<ActionResponse<unknown>> {
   try {
-    const session = await auth();
-
     const user = await prisma.user.findUnique({
       where: {
-        id: session?.user.id,
+        id: id || "",
       },
     });
 
@@ -413,11 +406,12 @@ export async function updateUser({
         userName,
         email,
         state,
-        displayName: `[${userName}] ${email}`,
+        displayName: name,
         Partner: {
           update: {
             name,
             email,
+            displayName: name,
           },
         },
       },

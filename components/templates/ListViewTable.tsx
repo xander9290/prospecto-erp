@@ -83,15 +83,15 @@ export function ListItem({
       <div>
         {avatar && (
           <Image
-            width={30}
-            height={30}
+            width={35}
+            height={35}
             src={avatar || "/image/avatar_default.svg"}
             alt="UserImage"
             className="rounded me-1"
             unoptimized
             style={{
-              width: "30px",
-              height: "30px",
+              width: "35px",
+              height: "35px",
             }}
           />
         )}
