@@ -158,14 +158,12 @@ function Many2oneField<T extends FieldValues>({
           disabled={disabled}
           readOnly={readOnly}
           isInvalid={isInvalid}
-          size="sm"
         />
         <Button
           variant="outline-secondary"
           type="button"
           onClick={handleMouseEnter}
           disabled={disabled}
-          size="sm"
         >
           {loading ? (
             <Spinner animation="border" size="sm" className="me-2" />

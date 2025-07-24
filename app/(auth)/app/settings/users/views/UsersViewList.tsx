@@ -6,7 +6,7 @@ import ListViewTable, {
   ListItemLink,
 } from "@/components/templates/ListViewTable";
 import ListViewTemplate from "@/components/templates/ListViewTemplate";
-import { UserWithPartner } from "@/libs/definitions";
+import { User } from "@/libs/definitions";
 import { formatDate } from "@/libs/helpers";
 import Link from "next/link";
 import { Badge, Dropdown, DropdownButton } from "react-bootstrap";
@@ -31,7 +31,7 @@ function UserViewList({
   page: number;
   perPage: number;
   total: number;
-  users: UserWithPartner[];
+  users: User[];
 }) {
   return (
     <ListViewTemplate
@@ -94,7 +94,7 @@ function UserViewList({
                 </DropdownButton>
               </ListItem>
               <ListItem name="userName">{user.userName}</ListItem>
-              <ListItem name="Partner.name" avatar={user.Partner.imageUrl}>
+              <ListItem name="Partner.name" avatar={user.imageUrl}>
                 {user.Partner ? user.Partner.name : "N/A"}
               </ListItem>
               <ListItem name="email">{user.email}</ListItem>

@@ -9,60 +9,35 @@ datasource db {
 }
 
 model Partner {
-  id             String  @id @default(cuid())
-  // Datos personales
-  name           String
-  displayName    String  @unique @map("display_name")
-  email          String?
-  phone          String?
-  street         String?
-  crosseStreets  String? @map("crosse_streets")
-  colony         String?
-  completeAdress String? @map("complete_address")
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  displayName String   @unique @map("display_name")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  User        User?
+  createdById String?  @default("") @map("created_by")
 
-  // Propiedades de model
-  state    String?
-  imageUrl String? @map("image_url")
-
-  // Relaciones
-  User User?
-
-  // Relación con el agente asignado
-  userId String? @map("user_id")
-  SUser  User?   @relation("SaleUser", fields: [userId], references: [id])
-
-  // Usuario de sesión
-  createdById String? @map("created_by")
-  CUser       User?   @relation("Creator", fields: [createdById], references: [id])
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@index([name, displayName, phone])
   @@map("partners")
 }
 
 model User {
-  id              String    @id @default(cuid())
-  state           String    @default("no_active")
-  password        String
-  lastLogin       DateTime? @map("last_login")
-  partnerId       String    @unique @default("") @map("partner_id")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  userName        String    @unique @map("user_name")
-  displayName     String    @unique @map("display_name")
-  email           String    @unique
-  Partner         Partner   @relation(fields: [partnerId], references: [id])
-  darkMode        Boolean   @default(false) @map("dark_mode")
-  Partners        Partner[] @relation("SaleUser")
-  CreatedPartners Partner[] @relation("Creator")
+  id          String    @id @default(cuid())
+  state       String    @default("no_active")
+  password    String
+  lastLogin   DateTime? @map("last_login")
+  partnerId   String    @unique @map("partner_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  userName    String    @unique @map("user_name")
+  displayName String    @unique @map("display_name")
+  email       String    @unique
+  imageUrl    String?   @map("image_url")
+  Partner     Partner   @relation(fields: [partnerId], references: [id])
+  darkMode    Boolean   @default(false) @map("dark_mode")
+  createdById String?   @default("") @map("created_by")
 
-  createdById String? @map("created_by")
-  CUser       User?   @relation("CreatorUid", fields: [createdById], references: [id])
-  Users       User[]  @relation("CreatorUid")
-
-  @@index([displayName, email, userName])
+  @@index([partnerId])
   @@map("users")
 }
 
