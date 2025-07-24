@@ -32,7 +32,7 @@ function TopNav() {
 
   return (
     <Navbar expand="lg" className="sticky-top bg-body-tertiary">
-      <Container>
+      <Container fluid>
         <Navbar.Toggle />
         <Navbar.Collapse>
           <TopNavItems />

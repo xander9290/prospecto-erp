@@ -6,7 +6,7 @@ import FormViewTemplate, {
   ViewGroupFluid,
 } from "@/components/templates/FormViewTemplate";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Form } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -39,7 +39,18 @@ type TInputs = {
   imageId: string | null;
 };
 
+const defaultValues: TInputs = {
+  userName: "",
+  password: "",
+  email: "",
+  name: "",
+  state: "",
+  imageId: "",
+};
+
 function UserViewForm() {
+  const originalValuesRef = useRef<TInputs | null>(null);
+
   const [disabled, setDisabled] = useState(false);
 
   const searchParams = useSearchParams();
@@ -97,15 +108,29 @@ function UserViewForm() {
       return;
     }
 
-    reset({
+    const newData: TInputs = {
       userName: res.data?.userName || "",
       email: res.data?.email || "",
       name: res.data?.Partner.name || "",
       password: "", // si quieres dejarlo vacío
-      state: res.data?.state,
+      state: res.data?.state || "",
       imageId: res.data?.Partner.imageId || null,
-    });
+    };
+
+    originalValuesRef.current = newData;
+
+    reset(newData);
+
     setDisabled(false);
+  };
+
+  const handleRevert = () => {
+    if (originalValuesRef.current) {
+      reset(originalValuesRef.current);
+      toast.success("Cambios revertidos");
+    } else {
+      toast.error("No hay datos anteriores para revertir");
+    }
   };
 
   const handleImageId = async (imageId: string) => {
@@ -117,6 +142,7 @@ function UserViewForm() {
     if (modelId !== "null") {
       handleFetchUser(modelId);
     } else {
+      originalValuesRef.current = defaultValues;
       reset({
         userName: "",
         state: "",
@@ -137,7 +163,8 @@ function UserViewForm() {
       state={state}
       onSubmit={handleSubmit(onSubmit)}
       disableForm={disabled}
-      isDirty={!isDirty}
+      isDirty={isDirty}
+      revert={handleRevert}
     >
       <ViewGroupFluid classname="d-flex justify-content-end">
         <ImageSource
@@ -158,6 +185,7 @@ function UserViewForm() {
             type="text"
             isInvalid={!!errors.userName}
             autoComplete="off"
+            size="sm"
           />
           <Form.Control.Feedback type="invalid">
             {errors.userName?.message}
@@ -166,6 +194,7 @@ function UserViewForm() {
         <Form.Group controlId="UserState" className="mb-3">
           <Form.Label>Estado:</Form.Label>
           <Form.Select
+            size="sm"
             {...register("state", { required: "Este campo es requerido" })}
             isInvalid={!!errors.state}
           >
@@ -196,6 +225,7 @@ function UserViewForm() {
             type="text"
             autoComplete="off"
             isInvalid={!!errors.name}
+            size="sm"
           />
           <Form.Control.Feedback type="invalid">
             {errors.name?.message}
@@ -207,6 +237,7 @@ function UserViewForm() {
             {...register("email")}
             type="email"
             autoComplete="off"
+            size="sm"
           />
         </Form.Group>
         {/* <Form.Group>

@@ -23,7 +23,8 @@ model Partner {
   province     String?
 
   // propiedades de modelo
-  state String?
+  state       String?
+  displayType PartnerType @default(INTERNAL)
 
   // relaciones
   User User?
@@ -42,6 +43,12 @@ model Partner {
 
   @@index([name, displayName, phone])
   @@map("partners")
+}
+
+enum PartnerType {
+  CUSTOMER
+  SUPPLIER
+  INTERNAL
 }
 
 model User {

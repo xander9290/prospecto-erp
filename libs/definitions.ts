@@ -18,6 +18,10 @@ export interface PartnerWithAttrs extends Partner {
   CreateUid: User | null;
 }
 
+export interface PartnerContacts extends PartnerWithAttrs {
+  UserId: User | null;
+}
+
 export interface UserWithPartner extends User {
   Partner: PartnerWithAttrs;
 }

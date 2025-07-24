@@ -122,7 +122,7 @@ function ImageSource({
       <Image
         src={imageSource.url ?? "/image/avatar_default.svg"}
         alt="user_image"
-        className="img-fluid rounded"
+        className="img-fluid rounded border"
         width={width}
         height={height}
         unoptimized

@@ -6,6 +6,38 @@ import { Nav, NavDropdown } from "react-bootstrap";
 function TopNavItems() {
   return (
     <Nav className="me-auto">
+      {/* CONTACTOS */}
+      <NavDropdown
+        title={
+          <>
+            <i className="bi bi-person-rolodex"></i>
+            <span className="ms-1">Contactos</span>
+          </>
+        }
+      >
+        <NavDropdown.Item
+          as={Link}
+          href="/app/contacts?view_mode=list&filter=CUSTOMER&page=1"
+        >
+          <i className="bi bi-person-lines-fill"></i>
+          <span className="ms-1">Clientes</span>
+        </NavDropdown.Item>
+        <NavDropdown.Item
+          as={Link}
+          href="/app/contacts?view_mode=list&filter=SUPPLIER&page=1"
+        >
+          <i className="bi bi-building"></i>
+          <span className="ms-1">Proveedores</span>
+        </NavDropdown.Item>
+        <NavDropdown.Item
+          as={Link}
+          href="/app/contacts?view_mode=list&filter=INTERNAL&page=1"
+        >
+          <i className="bi bi-person-vcard"></i>
+          <span className="ms-1">Empleados</span>
+        </NavDropdown.Item>
+      </NavDropdown>
+      {/* AJUSTES */}
       <NavDropdown
         title={
           <>

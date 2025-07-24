@@ -2,6 +2,7 @@
 
 import bcrypt from "bcryptjs";
 import prisma from "./prisma";
+import { PartnerType } from "@/generate/prisma";
 
 export async function initAdminUser() {
   const userCount = await prisma.user.count();
@@ -14,6 +15,7 @@ export async function initAdminUser() {
         name: "admin",
         displayName: "admin",
         email: "admin@correo.com",
+        displayType: PartnerType.INTERNAL,
         User: {
           create: {
             userName: "admin",

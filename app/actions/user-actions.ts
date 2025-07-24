@@ -1,5 +1,6 @@
 "use server";
 
+import { PartnerType } from "@/generate/prisma";
 import { auth, signIn } from "@/libs/auth";
 import { ActionResponse, UserWithPartner } from "@/libs/definitions";
 import prisma from "@/libs/prisma";
@@ -88,6 +89,7 @@ export async function createUser({
         name,
         email,
         displayName: name,
+        displayType: PartnerType.INTERNAL,
         createdById: session?.user.id,
         User: {
           create: {

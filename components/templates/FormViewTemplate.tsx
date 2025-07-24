@@ -3,6 +3,7 @@
 import { ModalBasicProps } from "@/libs/definitions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+
 import {
   Button,
   Col,
@@ -25,6 +26,7 @@ type FormViewTemplateProps = {
   disableForm?: boolean;
   onSubmit: React.FormEventHandler<HTMLFormElement>;
   isDirty: boolean;
+  revert: () => void;
 };
 
 type TFormActions = {
@@ -50,6 +52,7 @@ function FormViewTemplate({
   disableForm,
   onSubmit,
   isDirty,
+  revert,
 }: FormViewTemplateProps) {
   const searchParams = useSearchParams();
   const model_id = searchParams.get("id");
@@ -96,11 +99,17 @@ function FormViewTemplate({
                 variant="secondary"
                 type="submit"
                 title="Guardar"
-                disabled={isDirty}
+                disabled={!isDirty}
               >
                 <i className="bi bi-cloud-arrow-up-fill"></i>
               </Button>
-              <Button variant="secondary" type="button" title="Deshacer">
+              <Button
+                variant="secondary"
+                type="button"
+                title="Deshacer"
+                disabled={!isDirty}
+                onClick={revert}
+              >
                 <i className="bi bi-arrow-counterclockwise"></i>
               </Button>
             </div>
