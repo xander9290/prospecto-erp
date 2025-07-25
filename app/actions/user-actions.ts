@@ -96,7 +96,7 @@ export async function createUser({
             userName,
             email,
             password: hashedPassword,
-            displayName: `${name} - ${email}`,
+            displayName: `[${name}] ${userName}`,
             createdById: session?.user.id,
           },
         },
@@ -216,16 +216,12 @@ export async function userImageUpdate({
   id: string;
 }): Promise<ActionResponse<unknown>> {
   try {
-    const changedUser = await prisma.user.update({
+    const changedUser = await prisma.partner.update({
       where: {
-        id,
+        id: id || "",
       },
       data: {
-        Partner: {
-          update: {
-            imageId,
-          },
-        },
+        imageId,
       },
     });
 
@@ -413,7 +409,7 @@ export async function updateUser({
         userName,
         email,
         state,
-        displayName: `${userName} - ${email}`,
+        displayName: `[${userName}] ${name}`,
         Partner: {
           update: {
             name,

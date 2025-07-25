@@ -146,7 +146,7 @@ function Many2oneField<T extends FieldValues>({
       ref={ref}
       style={{ position: "relative", display: invisible ? "none" : "inline" }}
     >
-      <InputGroup>
+      <InputGroup size="sm">
         <Form.Control
           value={label}
           onChange={handleInputChange}
@@ -158,6 +158,7 @@ function Many2oneField<T extends FieldValues>({
           disabled={disabled}
           readOnly={readOnly}
           isInvalid={isInvalid}
+          size="sm"
         />
         <Button
           variant="outline-secondary"

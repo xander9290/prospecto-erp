@@ -13,7 +13,8 @@ import {
   ListGroup,
   Modal,
   Row,
-  Spinner,
+  Tab,
+  Tabs,
 } from "react-bootstrap";
 
 type FormViewTemplateProps = {
@@ -171,7 +172,7 @@ function FormViewTemplate({
               <h2 className="card-title fw-bolder text-capitalize">
                 {name ?? "nuevo"}
               </h2>
-              {disableForm && <Spinner animation="border" />}
+              {/* {disableForm && <Spinner animation="border" />} */}
               {/* STATEBAR - Desktop */}
               <ListGroup horizontal className="d-none d-md-flex">
                 {formStates?.map((st, i) => (
@@ -219,9 +220,20 @@ function FormViewTemplate({
   );
 }
 
-export const ViewGroup = ({ children }: { children: React.ReactNode }) => {
+export const ViewGroup = ({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title?: string;
+}) => {
   return (
     <Col xs="12" md="6">
+      {title && (
+        <h5 className="text-capitalize border-bottom border-2 fw-bold mt-2">
+          {title}
+        </h5>
+      )}
       <div className="p-3 bg-body-tertiary rounded">{children}</div>
     </Col>
   );
@@ -236,10 +248,41 @@ export const ViewGroupFluid = ({
 }) => {
   return (
     <Col xs="12" md="12" className="mt-2">
-      <div className={`p-2 bg-body-tertiary rounded ${classname}`}>
-        {children}
-      </div>
+      <div className={`p-2 rounded ${classname}`}>{children}</div>
     </Col>
+  );
+};
+
+export const Notebook = ({
+  children,
+  dKey,
+}: {
+  children: React.ReactNode;
+  dKey: string;
+}) => {
+  const [key, setKey] = useState(dKey);
+  return (
+    <ViewGroupFluid>
+      <Tabs accessKey={key} onSelect={(k) => setKey(k || "")}>
+        {children}
+      </Tabs>
+    </ViewGroupFluid>
+  );
+};
+
+export const NotePage = ({
+  children,
+  eventKey,
+  title,
+}: {
+  children: React.ReactNode;
+  eventKey: string;
+  title: string;
+}) => {
+  return (
+    <Tab eventKey={eventKey} title={title}>
+      {children}
+    </Tab>
   );
 };
 

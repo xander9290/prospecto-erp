@@ -1,6 +1,7 @@
 "use server";
 
-import { PartnerType } from "@/generate/prisma";
+import { Partner, PartnerType } from "@/generate/prisma";
+import { auth } from "@/libs/auth";
 import { ActionResponse, PartnerContacts } from "@/libs/definitions";
 import prisma from "@/libs/prisma";
 
@@ -43,6 +44,91 @@ export async function fetchContacts({
       success: true,
       message: "Contactos cargados",
       data: { contacts, total },
+    };
+  } catch (error: unknown) {
+    console.error(error);
+    return {
+      success: false,
+      message: "Error al cargar Partner @trycatch",
+    };
+  }
+}
+
+export async function fetchPartner({
+  id,
+}: {
+  id: string | null;
+}): Promise<ActionResponse<PartnerContacts>> {
+  try {
+    if (!id) {
+      return {
+        success: false,
+        message: "MISSING {ID}",
+      };
+    }
+    const partner = await prisma.partner.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        Image: true,
+        CreateUid: true,
+        UserId: true,
+      },
+    });
+
+    if (!partner) {
+      return {
+        success: false,
+        message: "PARTNER NOT FOUND",
+      };
+    }
+
+    return {
+      success: true,
+      message: "PARTNER WAS FOUND",
+      data: partner,
+    };
+  } catch (error: unknown) {
+    console.error(error);
+    return {
+      success: false,
+      message: "Error al cargar Partner @trycatch",
+    };
+  }
+}
+
+type TNewPartner = Omit<
+  Partner,
+  "createdAt" | "updatedAt" | "createdById" | "displayName" | "id"
+>;
+
+export async function createPartner({
+  data,
+}: {
+  data: TNewPartner;
+}): Promise<ActionResponse<string>> {
+  try {
+    const session = await auth();
+
+    const newPartner = await prisma.partner.create({
+      data: {
+        ...data,
+        createdById: session?.user.id,
+        displayName: `[${data.phone || ""}] ${data.name} - ${data.email || ""}`,
+      },
+    });
+
+    if (!newPartner) {
+      return {
+        success: false,
+        message: "PARTNER COULD NOT BE CREATED",
+      };
+    }
+    return {
+      success: true,
+      message: "PARTNER HAS BEEN CREATED SUCCESSFULLY",
+      data: newPartner.id,
     };
   } catch (error: unknown) {
     console.error(error);
