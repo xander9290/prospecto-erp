@@ -1,6 +1,7 @@
 import { PartnerType } from "@/generate/prisma";
 import { fetchContacts } from "../contacts-actions";
 import ContactViewList, { ContactFilter } from "./ContactViewList";
+import ContactViewForm from "./ContactViewForm";
 
 async function ContactsMainView({
   viewMode,
@@ -13,9 +14,10 @@ async function ContactsMainView({
   viewMode: string;
   filter: PartnerType;
 }) {
+  const skip = page || 1;
   const perPage = 50;
 
-  const res = await fetchContacts({ skip: page, perPage, search, filter });
+  const res = await fetchContacts({ skip, perPage, search, filter });
   const contacts = res.data?.contacts || null;
   const total = res.data?.total || 0;
 
@@ -29,6 +31,8 @@ async function ContactsMainView({
         total={total}
       />
     );
+  } else if (viewMode === "form") {
+    return <ContactViewForm />;
   }
 }
 

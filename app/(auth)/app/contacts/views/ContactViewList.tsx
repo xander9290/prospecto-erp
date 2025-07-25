@@ -34,7 +34,7 @@ function ContactViewList({
   return (
     <ListViewTemplate
       title={displayTypes[filter]}
-      viewForm="/app/contacts?view_mode=form&id=null"
+      viewForm={`/app/contacts?view_mode=form&id=null&filter=${filter}`}
       basePath="/app/contacts?view_mode=list&filter=INTERNAL&page=1"
       page={page} // Default to page 1
       perPage={perPage} // Default to 50 items per page
@@ -45,15 +45,18 @@ function ContactViewList({
           <ListViewTable.Column name="usersActions" className="text-center">
             <i className="bi bi-gear-fill"></i>
           </ListViewTable.Column>
-          <ListViewTable.Column name="Partner.name">
-            nombre
-          </ListViewTable.Column>
+          <ListViewTable.Column name="name">nombre</ListViewTable.Column>
+          <ListViewTable.Column name="email">correo</ListViewTable.Column>
+          <ListViewTable.Column name="phone">teléfono</ListViewTable.Column>
+          <ListViewTable.Column name="street">calle</ListViewTable.Column>
+          <ListViewTable.Column name="colony">colonia</ListViewTable.Column>
+          <ListViewTable.Column name="city">ciudad</ListViewTable.Column>
         </ListViewTable.Header>
         <ListViewTable.Content>
           {contacts?.map((partner) => (
             <ListItemLink
               key={partner.id}
-              path={`/app/contacts?view_mode=form&id=${partner.id}`}
+              path={`/app/contacts?view_mode=form&id=${partner.id}&filter=${filter}`}
             >
               <ListItem name="usersActions" className="text-center">
                 <DropdownButton
@@ -85,6 +88,11 @@ function ContactViewList({
                   {partner.name}
                 </div>
               </ListItem>
+              <ListItem name="email">{partner.email}</ListItem>
+              <ListItem name="phone">{partner.phone}</ListItem>
+              <ListItem name="street">{partner.street}</ListItem>
+              <ListItem name="colony">{partner.colony}</ListItem>
+              <ListItem name="city">{partner.city}</ListItem>
             </ListItemLink>
           ))}
         </ListViewTable.Content>
