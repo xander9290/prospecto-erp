@@ -111,7 +111,7 @@ function UserViewForm() {
     const newData: TInputs = {
       userName: res.data?.userName || "",
       email: res.data?.email || "",
-      name: res.data?.relatedPartner.name || "",
+      name: res.data?.Partner.name || "",
       password: "", // si quieres dejarlo vacío
       state: res.data?.state || "",
       imageId: res.data?.Partner.imageId || null,

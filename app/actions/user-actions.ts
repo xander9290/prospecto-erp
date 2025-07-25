@@ -229,7 +229,7 @@ export async function userImageUpdate({
       },
     });
 
-    if (!changedImage) {
+    if (!changedUser) {
       return {
         success: false,
         message: "Error al actualizar la url de la imagen",
@@ -296,8 +296,8 @@ export async function updateUserProfile({
       },
       data: {
         email,
-        displayName: `${userName} - ${name}`,
-        relatedPartner: {
+        displayName: `[${userName}] ${email}`,
+        Partner: {
           update: {
             email,
             name,
@@ -331,16 +331,16 @@ export async function updateUserProfile({
 export async function changeUserPassword({
   currentPassword,
   newPassword,
-  id,
 }: {
   currentPassword: string;
   newPassword: string;
-  id: string | null;
 }): Promise<ActionResponse<unknown>> {
   try {
+    const session = await auth();
+
     const user = await prisma.user.findUnique({
       where: {
-        id: id || "",
+        id: session?.user.id,
       },
     });
 

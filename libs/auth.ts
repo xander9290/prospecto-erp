@@ -16,7 +16,7 @@ export const authOptions = {
 
         user = await prisma.user.findUnique({
           where: { userName: email as string },
-          include: { relatedPartner: true },
+          include: { Partner: true },
         });
 
         if (!user) {

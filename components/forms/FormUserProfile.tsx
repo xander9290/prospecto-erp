@@ -37,7 +37,7 @@ function FormUserProfile({ user }: { user: UserWithPartner | null }) {
     handleSubmit,
   } = useForm<TInputs>({
     defaultValues: {
-      name: user?.relatedPartner.name ?? "Desconocido",
+      name: user?.Partner.name ?? "Desconocido",
       email: user?.email ?? "Desconocido",
     },
   });
@@ -77,7 +77,7 @@ function FormUserProfile({ user }: { user: UserWithPartner | null }) {
           <Form className="card mt-1" onSubmit={handleSubmit(onSubmit)}>
             <div className="card-header d-flex justify-content-between">
               <h5 className="card-title text-capitalize">
-                {user?.relatedPartner.name}
+                {user?.Partner.name}
               </h5>
               <fieldset className="d-flex gap-1" disabled={disabled}>
                 <Button
@@ -185,7 +185,6 @@ function FormUserProfile({ user }: { user: UserWithPartner | null }) {
         <ModalChangePassword
           show={modalChangePassword}
           onHide={() => setModalChangePassword(false)}
-          id={session?.user.id}
         />
       </Row>
     </Container>

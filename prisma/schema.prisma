@@ -56,12 +56,12 @@ model User {
   state       String    @default("no_active")
   password    String
   lastLogin   DateTime? @map("last_login")
+  partnerId   String    @unique @map("partner_id")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
   userName    String    @unique @map("user_name")
   displayName String    @unique @map("display_name")
   email       String    @unique
-  partnerId   String    @unique
   Partner     Partner   @relation(fields: [partnerId], references: [id])
   darkMode    Boolean   @default(false) @map("dark_mode")
   createdById String?   @map("created_by")
