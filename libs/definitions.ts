@@ -1,3 +1,5 @@
+import { Partner, User } from "@/generate/prisma";
+
 export interface ActionResponse<T> {
   success: boolean;
   message: string;
@@ -11,31 +13,8 @@ export interface ModalBasicProps {
   string?: string;
 }
 
-export interface Partner {
-  id: string;
-  name: string;
-  displayName: string;
-  email: string | null;
-  createdById: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface User {
-  id: string;
-  userName: string;
-  displayName: string;
-  password: string;
-  email: string;
-  imageUrl: string | null;
-  lastLogin: Date | null;
-  Partner: Partner;
-  partnerId: string;
-  state: string;
-  darkMode: boolean;
-  createdById: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+export interface UserWithPartner extends User {
+  relatedPartner: Partner;
 }
 
 export interface ImageSource {

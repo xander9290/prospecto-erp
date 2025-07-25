@@ -1,6 +1,5 @@
 "use client";
 
-import { User } from "@/libs/definitions";
 import { useSession } from "next-auth/react";
 import {
   Button,
@@ -18,13 +17,14 @@ import { formatDate } from "@/libs/helpers";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import ModalChangePassword from "../modals/ModalChangePassword";
+import { UserWithPartner } from "@/libs/definitions";
 
 type TInputs = {
   name: string;
   email: string;
 };
 
-function FormUserProfile({ user }: { user: User | null }) {
+function FormUserProfile({ user }: { user: UserWithPartner | null }) {
   const { data: session } = useSession();
 
   const [block, setBlock] = useState(true);
@@ -37,7 +37,7 @@ function FormUserProfile({ user }: { user: User | null }) {
     handleSubmit,
   } = useForm<TInputs>({
     defaultValues: {
-      name: user?.Partner.name ?? "Desconocido",
+      name: user?.relatedPartner.name ?? "Desconocido",
       email: user?.email ?? "Desconocido",
     },
   });
@@ -66,8 +66,7 @@ function FormUserProfile({ user }: { user: User | null }) {
   };
 
   const handleImageUrl = async (url: string) => {
-    if (!url) return;
-    await userImageUpdate(url);
+    await userImageUpdate({ imageUrl: url, id: user?.relatedPartner.id || "" });
   };
 
   return (
@@ -77,7 +76,7 @@ function FormUserProfile({ user }: { user: User | null }) {
           <Form className="card mt-1" onSubmit={handleSubmit(onSubmit)}>
             <div className="card-header d-flex justify-content-between">
               <h5 className="card-title text-capitalize">
-                {user?.Partner.name}
+                {user?.relatedPartner.name}
               </h5>
               <fieldset className="d-flex gap-1" disabled={disabled}>
                 <Button
@@ -181,6 +180,7 @@ function FormUserProfile({ user }: { user: User | null }) {
         <ModalChangePassword
           show={modalChangePassword}
           onHide={() => setModalChangePassword(false)}
+          id={session?.user.id}
         />
       </Row>
     </Container>

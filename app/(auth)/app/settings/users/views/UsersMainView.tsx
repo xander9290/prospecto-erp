@@ -24,14 +24,16 @@ async function PageUsersMainView({
         OR: [
           { userName: { contains: search, mode: "insensitive" } },
           { email: { contains: search, mode: "insensitive" } },
-          { Partner: { name: { contains: search, mode: "insensitive" } } },
+          {
+            relatedPartner: { name: { contains: search, mode: "insensitive" } },
+          },
         ],
       },
       skip: (p - 1) * perPage,
       take: perPage,
       orderBy: { id: "asc" },
       include: {
-        Partner: true,
+        relatedPartner: true,
       },
     }),
     prisma.user.count(),

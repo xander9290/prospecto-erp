@@ -9,15 +9,33 @@ datasource db {
 }
 
 model Partner {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   name        String
   email       String?
-  displayName String   @unique @map("display_name")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  User        User?
-  createdById String?  @default("") @map("created_by")
+  displayName String  @unique @map("display_name")
+  phone       String?
+  street      String?
+  colony      String?
+  crossStreet String? @map("cross_street")
+  city        String?
 
+  // PROPIEDADES DEL MODELO
+  imageUrl String? @map("image_url")
+  state    String?
+
+  // Relaciones
+  createdById String? @map("created_by")
+  createUid   User?   @relation("CreateUid", fields: [createdById], references: [id])
+
+  agentId  String? @map("agent_id")
+  agentUid User?   @relation("AgentUser", fields: [agentId], references: [id])
+
+  userUid User? @relation("RelatedPartner")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([name, displayName])
   @@map("partners")
 }
 
@@ -26,18 +44,21 @@ model User {
   state       String    @default("no_active")
   password    String
   lastLogin   DateTime? @map("last_login")
-  partnerId   String    @unique @map("partner_id")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
   userName    String    @unique @map("user_name")
   displayName String    @unique @map("display_name")
   email       String    @unique
-  imageUrl    String?   @map("image_url")
-  Partner     Partner   @relation(fields: [partnerId], references: [id])
   darkMode    Boolean   @default(false) @map("dark_mode")
-  createdById String?   @default("") @map("created_by")
+  createdById String?   @map("created_by")
 
-  @@index([partnerId])
+  partnerId      String  @unique @map("partner_id")
+  relatedPartner Partner @relation("RelatedPartner", fields: [partnerId], references: [id])
+
+  createdPartners Partner[] @relation("CreateUid")
+  leadPartners    Partner[] @relation("AgentUser")
+
+  @@index([userName, displayName, email])
   @@map("users")
 }
 

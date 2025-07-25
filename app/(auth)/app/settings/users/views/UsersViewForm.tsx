@@ -11,8 +11,6 @@ import toast from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createUser, fetchUser, updateUser } from "@/app/actions/user-actions";
 import { useRouter } from "next/navigation";
-import Many2oneField from "@/components/Many2oneField";
-import { User } from "@/generate/prisma";
 
 const formStates: TFormState[] = [
   {
@@ -31,8 +29,6 @@ type TInputs = {
   email: string;
   name: string;
   state: string;
-  group: string;
-  createdById: string | null;
 };
 
 function UserViewForm() {
@@ -49,11 +45,9 @@ function UserViewForm() {
     formState: { errors, isDirty },
     reset,
     watch,
-    control,
-    setValue,
   } = useForm<TInputs>();
 
-  const [name, state, group] = watch(["name", "state", "group"]);
+  const [name, state] = watch(["name", "state"]);
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     if (modelId === "null") {
@@ -98,10 +92,9 @@ function UserViewForm() {
     reset({
       userName: res.data?.userName || "",
       email: res.data?.email || "",
-      name: res.data?.Partner.name || "",
+      name: res.data?.relatedPartner.name || "",
       password: "", // si quieres dejarlo vacío
       state: res.data?.state,
-      group: modelId || "",
     });
     setDisabled(false);
   };
@@ -113,22 +106,12 @@ function UserViewForm() {
       reset({
         userName: "",
         state: "",
-        group: "",
         name: "",
         password: "",
         email: "",
       });
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    if (group) {
-      const getGroup = group as unknown as User;
-      setValue("createdById", getGroup.createdById);
-    } else {
-      setValue("createdById", null);
-    }
-  }, [group]);
 
   return (
     <FormViewTemplate
@@ -168,7 +151,7 @@ function UserViewForm() {
             {errors.state?.message}
           </Form.Control.Feedback>
         </Form.Group>
-        <Form.Group controlId="UserGroup" className="mb-3">
+        {/* <Form.Group controlId="UserGroup" className="mb-3">
           <Form.Label>Grupo:</Form.Label>
           <Many2oneField<TInputs>
             model="user"
@@ -176,7 +159,7 @@ function UserViewForm() {
             control={control}
             isInvalid={!!errors.group}
           />
-        </Form.Group>
+        </Form.Group> */}
       </ViewGroup>
 
       <ViewGroup>
@@ -200,7 +183,7 @@ function UserViewForm() {
             autoComplete="off"
           />
         </Form.Group>
-        <Form.Group>
+        {/* <Form.Group>
           <Form.Label>Creado por:</Form.Label>
           <Many2oneField
             {...register("createdById")}
@@ -208,7 +191,7 @@ function UserViewForm() {
             control={control}
             disabled
           />
-        </Form.Group>
+        </Form.Group> */}
       </ViewGroup>
     </FormViewTemplate>
   );

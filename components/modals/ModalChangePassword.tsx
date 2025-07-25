@@ -1,7 +1,7 @@
 "use client";
 
 import { changeUserPassword } from "@/app/actions/user-actions";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -9,6 +9,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 type TModalProps = {
   show: boolean;
   onHide: () => void;
+  id: string | null;
 };
 
 type TInputs = {
@@ -17,7 +18,7 @@ type TInputs = {
   confirmPassword: string;
 };
 
-function ModalChangePassword({ show, onHide }: TModalProps) {
+function ModalChangePassword({ show, onHide, id }: TModalProps) {
   const [loading, setLoading] = useState(false);
 
   const {
@@ -40,7 +41,7 @@ function ModalChangePassword({ show, onHide }: TModalProps) {
       return;
     }
 
-    const res = await changeUserPassword(data);
+    const res = await changeUserPassword({ ...data, id });
 
     if (!res.success) {
       setError("currentPassword", {

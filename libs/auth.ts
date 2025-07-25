@@ -16,7 +16,7 @@ export const authOptions = {
 
         user = await prisma.user.findUnique({
           where: { userName: email as string },
-          include: { Partner: true },
+          include: { relatedPartner: true },
         });
 
         if (!user) {
@@ -44,8 +44,7 @@ export const authOptions = {
         return {
           id: user.id,
           email: user.email,
-          name: user.Partner.name,
-          image: user.imageUrl,
+          name: user.relatedPartner.name,
           darkMode: user.darkMode,
         };
       },
