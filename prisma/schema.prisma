@@ -9,34 +9,46 @@ datasource db {
 }
 
 model Partner {
-  id          String  @id @default(cuid())
-  name        String
-  email       String?
-  displayName String  @unique @map("display_name")
-  phone       String?
-  street      String?
-  colony      String?
-  crossStreet String? @map("cross_street")
-  city        String?
+  id String @id @default(cuid())
 
-  // PROPIEDADES DEL MODELO
-  imageUrl String? @map("image_url")
-  state    String?
+  // datos personales
+  name         String
+  displayName  String  @unique @map("display_name")
+  email        String?
+  phone        String?
+  street       String?
+  colony       String?
+  crossStreets String? @map("cross_streets")
+  city         String?
+  province     String?
 
-  // Relaciones
+  // propiedades de modelo
+  state       String?
+  displayType PartnerType @default(INTERNAL)
+
+  // relaciones
+  User User?
+
+  imageId String? @unique @map("image_id")
+  Image   Image?  @relation("EntityImage", fields: [imageId], references: [id])
+
+  userId String? @map("user_id")
+  UserId User?   @relation("AgentUser", fields: [userId], references: [id])
+
   createdById String? @map("created_by")
-  createUid   User?   @relation("CreateUid", fields: [createdById], references: [id])
-
-  agentId  String? @map("agent_id")
-  agentUid User?   @relation("AgentUser", fields: [agentId], references: [id])
-
-  userUid User? @relation("RelatedPartner")
+  CreateUid   User?   @relation("CreateUid", fields: [createdById], references: [id])
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@index([name, displayName])
+  @@index([name, displayName, phone])
   @@map("partners")
+}
+
+enum PartnerType {
+  CUSTOMER
+  SUPPLIER
+  INTERNAL
 }
 
 model User {
@@ -49,27 +61,27 @@ model User {
   userName    String    @unique @map("user_name")
   displayName String    @unique @map("display_name")
   email       String    @unique
+  Partner     Partner   @relation(fields: [partnerId], references: [id])
   darkMode    Boolean   @default(false) @map("dark_mode")
   createdById String?   @map("created_by")
 
-  partnerId      String  @unique @map("partner_id")
-  relatedPartner Partner @relation("RelatedPartner", fields: [partnerId], references: [id])
+  Partners     Partner[] @relation("CreateUid")
+  PartnerLeads Partner[] @relation("AgentUser")
 
-  createdPartners Partner[] @relation("CreateUid")
-  leadPartners    Partner[] @relation("AgentUser")
-
-  @@index([userName, displayName, email])
+  @@index([displayName, userName, email])
   @@map("users")
 }
 
 model Image {
-  id         String   @id @default(cuid())
+  id         String  @id @default(cuid())
   url        String
-  publicId   String   @map("public_id")
-  entityType String
-  entityId   String
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  publicId   String  @map("public_id")
+  entityType String?
+
+  Partner Partner? @relation("EntityImage")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("images")
 }
@@ -82,6 +94,7 @@ model Request {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  @@index([name, email])
   @@map("requests")
 }
 

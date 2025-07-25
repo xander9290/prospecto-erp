@@ -1,5 +1,6 @@
 "use server";
 
+import { PartnerType } from "@/generate/prisma";
 import { auth, signIn } from "@/libs/auth";
 import { ActionResponse, UserWithPartner } from "@/libs/definitions";
 import prisma from "@/libs/prisma";
@@ -88,19 +89,20 @@ export async function createUser({
         name,
         email,
         displayName: name,
+        displayType: PartnerType.INTERNAL,
         createdById: session?.user.id,
-        userUid: {
+        User: {
           create: {
             userName,
             email,
-            displayName: `${userName} - ${name}`,
             password: hashedPassword,
+            displayName: `${name} - ${email}`,
             createdById: session?.user.id,
           },
         },
       },
       include: {
-        userUid: true,
+        User: true,
       },
     });
 
@@ -114,7 +116,7 @@ export async function createUser({
     return {
       success: true,
       message: "El usuario se ha creado",
-      data: newPartner.userUid?.id,
+      data: newPartner.User?.id,
     };
   } catch (error: unknown) {
     console.error(error);
@@ -176,7 +178,12 @@ export async function fetchUser({
         id,
       },
       include: {
-        relatedPartner: true,
+        Partner: {
+          include: {
+            Image: true,
+            CreateUid: true,
+          },
+        },
       },
     });
 
@@ -202,19 +209,23 @@ export async function fetchUser({
 }
 
 export async function userImageUpdate({
-  imageUrl,
+  imageId,
   id,
 }: {
-  imageUrl: string;
-  id: string | null;
+  imageId: string;
+  id: string;
 }): Promise<ActionResponse<unknown>> {
   try {
-    const changedImage = await prisma.partner.update({
+    const changedUser = await prisma.user.update({
       where: {
-        id: id || "",
+        id,
       },
       data: {
-        imageUrl: imageUrl ? imageUrl : null,
+        Partner: {
+          update: {
+            imageId,
+          },
+        },
       },
     });
 
@@ -224,6 +235,8 @@ export async function userImageUpdate({
         message: "Error al actualizar la url de la imagen",
       };
     }
+
+    revalidatePath("/app/settings/users");
 
     return {
       success: true,
@@ -400,8 +413,8 @@ export async function updateUser({
         userName,
         email,
         state,
-        displayName: `${userName} - ${name}`,
-        relatedPartner: {
+        displayName: `${userName} - ${email}`,
+        Partner: {
           update: {
             name,
             email,

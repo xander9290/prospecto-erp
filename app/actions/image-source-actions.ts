@@ -3,17 +3,16 @@
 import { Readable } from "stream";
 import prisma from "@/libs/prisma"; // tu instancia de prisma
 import cloudinary from "@/libs/cloudinary";
-import { ActionResponse, ImageSource } from "@/libs/definitions";
+import { ActionResponse } from "@/libs/definitions";
 import { UploadApiResponse } from "cloudinary";
+import { Image } from "@/generate/prisma";
 
 export async function createImage({
   formData,
   entityType,
-  entityId,
 }: {
   formData: FormData;
   entityType: string;
-  entityId: string | undefined;
 }): Promise<ActionResponse<unknown>> {
   const image = formData.get("image") as File;
 
@@ -49,8 +48,6 @@ export async function createImage({
       data: {
         url: result.secure_url,
         publicId: result.public_id,
-        entityType,
-        entityId: entityId ?? "unknown",
       },
     });
 
@@ -60,6 +57,7 @@ export async function createImage({
       data: {
         url: saved.url,
         publicId: saved.publicId,
+        id: saved.id,
       },
     };
   } catch (error) {
@@ -71,25 +69,22 @@ export async function createImage({
   }
 }
 
-export async function fetchImages({
-  entityType,
-  entityId,
+export async function fetchImage({
+  id,
 }: {
-  entityType: string;
-  entityId: string | undefined;
-}): Promise<ActionResponse<ImageSource[]>> {
+  id: string;
+}): Promise<ActionResponse<Image>> {
   try {
-    const findImage = await prisma.image.findMany({
+    const findImage = await prisma.image.findUnique({
       where: {
-        entityType,
-        entityId,
+        id,
       },
     });
 
     if (!findImage) {
       return {
         success: false,
-        message: "No se pudo carga la imagen",
+        message: "No se contró una imagen",
       };
     }
 
@@ -134,6 +129,7 @@ export async function removeImage({
         publicId,
       },
     });
+
     return {
       success: true,
       message: "La imagen ha sido removida",

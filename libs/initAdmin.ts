@@ -1,29 +1,31 @@
 "use server";
-// lib/initAdmin.ts
+
 import bcrypt from "bcryptjs";
 import prisma from "./prisma";
+import { PartnerType } from "@/generate/prisma";
 
 export async function initAdminUser() {
   const userCount = await prisma.user.count();
 
   if (userCount === 0) {
-    const hashedPassword = await bcrypt.hash("4dm1n*", 10);
+    const hashedPassword = await bcrypt.hash("1234abcd", 10);
 
     await prisma.partner.create({
       data: {
         name: "admin",
         displayName: "admin",
-        userUid: {
+        email: "admin@correo.com",
+        displayType: PartnerType.INTERNAL,
+        User: {
           create: {
             userName: "admin",
-            displayName: "admin - admin@correo.com",
             email: "admin@correo.com",
             password: hashedPassword,
+            displayName: "admin - admin@correo.com",
+            state: "activo",
           },
         },
       },
     });
-
-    console.log("Usuario admin inicial creado");
   }
 }

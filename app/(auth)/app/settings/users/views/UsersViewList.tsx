@@ -1,6 +1,7 @@
 "use client";
 
 import { TFormState } from "@/components/templates/FormViewTemplate";
+import ImageAvatar from "@/components/templates/ImageAvatar";
 import ListViewTable, {
   ListItem,
   ListItemLink,
@@ -47,10 +48,10 @@ function UserViewList({
           <ListViewTable.Column name="usersActions" className="text-center">
             <i className="bi bi-gear-fill"></i>
           </ListViewTable.Column>
-          <ListViewTable.Column name="userName">usuario</ListViewTable.Column>
           <ListViewTable.Column name="Partner.name">
             nombre
           </ListViewTable.Column>
+          <ListViewTable.Column name="userName">usuario</ListViewTable.Column>
           <ListViewTable.Column name="email">correo</ListViewTable.Column>
           <ListViewTable.Column name="state">Estado</ListViewTable.Column>
           <ListViewTable.Column name="lastLogin">
@@ -61,6 +62,9 @@ function UserViewList({
           </ListViewTable.Column>
           <ListViewTable.Column name="createdAt">
             creado el
+          </ListViewTable.Column>
+          <ListViewTable.Column name="Partner.CreateUid">
+            creado por
           </ListViewTable.Column>
         </ListViewTable.Header>
         <ListViewTable.Content>
@@ -93,13 +97,13 @@ function UserViewList({
                   </Dropdown.Item>
                 </DropdownButton>
               </ListItem>
-              <ListItem name="userName">{user.userName}</ListItem>
-              <ListItem
-                name="Partner.name"
-                avatar={user.relatedPartner.imageUrl}
-              >
-                {user.relatedPartner ? user.relatedPartner.name : "N/A"}
+              <ListItem name="Partner.name">
+                <div className="d-flex gap-1 align-items-center">
+                  <ImageAvatar imageUrl={user.Partner.Image?.url || null} />
+                  {user.Partner ? user.Partner.name : "N/A"}
+                </div>
               </ListItem>
+              <ListItem name="userName">{user.userName}</ListItem>
               <ListItem name="email">{user.email}</ListItem>
               <ListItem name="state" className="text-capitalize">
                 <Badge bg={user.state === "no_active" ? "danger" : "success"}>
@@ -114,6 +118,9 @@ function UserViewList({
                 {user.updatedAt ? formatDate(user.updatedAt) : ""}
               </ListItem>
               <ListItem name="createdAt">{formatDate(user.createdAt)}</ListItem>
+              <ListItem name="Partner.CreateUid">
+                {user.Partner.CreateUid?.userName ?? "bot"}
+              </ListItem>
             </ListItemLink>
           ))}
         </ListViewTable.Content>

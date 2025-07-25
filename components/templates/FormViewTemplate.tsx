@@ -3,6 +3,7 @@
 import { ModalBasicProps } from "@/libs/definitions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+
 import {
   Button,
   Col,
@@ -25,6 +26,7 @@ type FormViewTemplateProps = {
   disableForm?: boolean;
   onSubmit: React.FormEventHandler<HTMLFormElement>;
   isDirty: boolean;
+  revert: () => void;
 };
 
 type TFormActions = {
@@ -50,6 +52,7 @@ function FormViewTemplate({
   disableForm,
   onSubmit,
   isDirty,
+  revert,
 }: FormViewTemplateProps) {
   const searchParams = useSearchParams();
   const model_id = searchParams.get("id");
@@ -93,14 +96,20 @@ function FormViewTemplate({
                 </Button>
               )}
               <Button
-                variant="light"
+                variant="secondary"
                 type="submit"
                 title="Guardar"
-                disabled={isDirty}
+                disabled={!isDirty}
               >
                 <i className="bi bi-cloud-arrow-up-fill"></i>
               </Button>
-              <Button variant="light" type="button" title="Deshacer">
+              <Button
+                variant="secondary"
+                type="button"
+                title="Deshacer"
+                disabled={!isDirty}
+                onClick={revert}
+              >
                 <i className="bi bi-arrow-counterclockwise"></i>
               </Button>
             </div>
@@ -148,7 +157,7 @@ function FormViewTemplate({
             </div>
             <Button
               onClick={() => router.back()}
-              variant="light"
+              variant="info"
               title="Regresar"
             >
               <i className="bi bi-arrow-left"></i>
@@ -159,9 +168,9 @@ function FormViewTemplate({
             disabled={disableForm}
           >
             <div className="d-flex justify-content-between align-items-end mb-2">
-              <h4 className="card-title fw-bolder text-capitalize">
+              <h2 className="card-title fw-bolder text-capitalize">
                 {name ?? "nuevo"}
-              </h4>
+              </h2>
               {disableForm && <Spinner animation="border" />}
               {/* STATEBAR - Desktop */}
               <ListGroup horizontal className="d-none d-md-flex">
@@ -218,10 +227,18 @@ export const ViewGroup = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const ViewGroupFluid = ({ children }: { children: React.ReactNode }) => {
+export const ViewGroupFluid = ({
+  children,
+  classname,
+}: {
+  children: React.ReactNode;
+  classname?: string;
+}) => {
   return (
     <Col xs="12" md="12" className="mt-2">
-      <div className="p-2 bg-body-tertiaryrounded">{children}</div>
+      <div className={`p-2 bg-body-tertiary rounded ${classname}`}>
+        {children}
+      </div>
     </Col>
   );
 };

@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { Table } from "react-bootstrap";
-import Image from "next/image";
 
 function ListViewTable({
   children,
@@ -12,7 +11,7 @@ function ListViewTable({
   className?: string;
 }) {
   return (
-    <Table className={className} striped hover>
+    <Table size="sm" className={className} hover>
       {children}
     </Table>
   );
@@ -71,32 +70,14 @@ export function ListItem({
   children,
   className,
   name,
-  avatar,
 }: {
   children: React.ReactNode;
   className?: string;
   name: string;
-  avatar?: string | null;
 }) {
   return (
     <td valign="middle" title={name} className={`text-nowrap ${className}`}>
-      <div>
-        {avatar && (
-          <Image
-            width={30}
-            height={30}
-            src={avatar || "/image/avatar_default.svg"}
-            alt="UserImage"
-            className="rounded me-1"
-            unoptimized
-            style={{
-              width: "30px",
-              height: "30px",
-            }}
-          />
-        )}
-        <span>{children}</span>
-      </div>
+      {children}
     </td>
   );
 }

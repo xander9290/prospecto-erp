@@ -3,14 +3,21 @@
 import FormViewTemplate, {
   TFormState,
   ViewGroup,
+  ViewGroupFluid,
 } from "@/components/templates/FormViewTemplate";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Form } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createUser, fetchUser, updateUser } from "@/app/actions/user-actions";
+import {
+  createUser,
+  fetchUser,
+  updateUser,
+  userImageUpdate,
+} from "@/app/actions/user-actions";
 import { useRouter } from "next/navigation";
+import ImageSource from "@/components/ImageSource";
 
 const formStates: TFormState[] = [
   {
@@ -29,9 +36,21 @@ type TInputs = {
   email: string;
   name: string;
   state: string;
+  imageId: string | null;
+};
+
+const defaultValues: TInputs = {
+  userName: "",
+  password: "",
+  email: "",
+  name: "",
+  state: "",
+  imageId: "",
 };
 
 function UserViewForm() {
+  const originalValuesRef = useRef<TInputs | null>(null);
+
   const [disabled, setDisabled] = useState(false);
 
   const searchParams = useSearchParams();
@@ -47,7 +66,7 @@ function UserViewForm() {
     watch,
   } = useForm<TInputs>();
 
-  const [name, state] = watch(["name", "state"]);
+  const [name, state, imageId] = watch(["name", "state", "imageId"]);
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     if (modelId === "null") {
@@ -89,26 +108,48 @@ function UserViewForm() {
       return;
     }
 
-    reset({
+    const newData: TInputs = {
       userName: res.data?.userName || "",
       email: res.data?.email || "",
       name: res.data?.relatedPartner.name || "",
       password: "", // si quieres dejarlo vacío
-      state: res.data?.state,
-    });
+      state: res.data?.state || "",
+      imageId: res.data?.Partner.imageId || null,
+    };
+
+    originalValuesRef.current = newData;
+
+    reset(newData);
+
     setDisabled(false);
+  };
+
+  const handleRevert = () => {
+    if (originalValuesRef.current) {
+      reset(originalValuesRef.current);
+      toast.success("Cambios revertidos");
+    } else {
+      toast.error("No hay datos anteriores para revertir");
+    }
+  };
+
+  const handleImageId = async (imageId: string) => {
+    if (!imageId) return;
+    await userImageUpdate({ id: modelId || "", imageId });
   };
 
   useEffect(() => {
     if (modelId !== "null") {
       handleFetchUser(modelId);
     } else {
+      originalValuesRef.current = defaultValues;
       reset({
         userName: "",
         state: "",
         name: "",
         password: "",
         email: "",
+        imageId: null,
       });
     }
   }, [searchParams]);
@@ -122,8 +163,20 @@ function UserViewForm() {
       state={state}
       onSubmit={handleSubmit(onSubmit)}
       disableForm={disabled}
-      isDirty={!isDirty}
+      isDirty={isDirty}
+      revert={handleRevert}
     >
+      <ViewGroupFluid classname="d-flex justify-content-end">
+        <ImageSource
+          entityType="users"
+          sourceId={imageId}
+          width={125}
+          height={125}
+          editable={true}
+          remove={true}
+          getImageId={handleImageId}
+        />
+      </ViewGroupFluid>
       <ViewGroup>
         <Form.Group controlId="UserUserName" className="mb-3">
           <Form.Label>Usuario:</Form.Label>
@@ -132,6 +185,7 @@ function UserViewForm() {
             type="text"
             isInvalid={!!errors.userName}
             autoComplete="off"
+            size="sm"
           />
           <Form.Control.Feedback type="invalid">
             {errors.userName?.message}
@@ -140,6 +194,7 @@ function UserViewForm() {
         <Form.Group controlId="UserState" className="mb-3">
           <Form.Label>Estado:</Form.Label>
           <Form.Select
+            size="sm"
             {...register("state", { required: "Este campo es requerido" })}
             isInvalid={!!errors.state}
           >
@@ -170,6 +225,7 @@ function UserViewForm() {
             type="text"
             autoComplete="off"
             isInvalid={!!errors.name}
+            size="sm"
           />
           <Form.Control.Feedback type="invalid">
             {errors.name?.message}
@@ -181,6 +237,7 @@ function UserViewForm() {
             {...register("email")}
             type="email"
             autoComplete="off"
+            size="sm"
           />
         </Form.Group>
         {/* <Form.Group>

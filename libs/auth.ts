@@ -44,7 +44,7 @@ export const authOptions = {
         return {
           id: user.id,
           email: user.email,
-          name: user.relatedPartner.name,
+          name: user.Partner.name,
           darkMode: user.darkMode,
         };
       },

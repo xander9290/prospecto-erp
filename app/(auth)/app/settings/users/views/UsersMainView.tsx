@@ -33,7 +33,12 @@ async function PageUsersMainView({
       take: perPage,
       orderBy: { id: "asc" },
       include: {
-        relatedPartner: true,
+        Partner: {
+          include: {
+            Image: true,
+            CreateUid: true,
+          },
+        },
       },
     }),
     prisma.user.count(),

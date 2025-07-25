@@ -65,8 +65,9 @@ function FormUserProfile({ user }: { user: UserWithPartner | null }) {
     setBlock(true);
   };
 
-  const handleImageUrl = async (url: string) => {
-    await userImageUpdate({ imageUrl: url, id: user?.relatedPartner.id || "" });
+  const handleImageId = async (imageId: string) => {
+    if (!imageId) return;
+    await userImageUpdate({ id: session?.user.id, imageId });
   };
 
   return (
@@ -122,8 +123,12 @@ function FormUserProfile({ user }: { user: UserWithPartner | null }) {
                 <Col md="3" className="text-center">
                   <ImageSource
                     entityType="users"
-                    entityId={session?.user?.id}
-                    getUrl={handleImageUrl}
+                    sourceId={user?.Partner.imageId || ""}
+                    getImageId={handleImageId}
+                    width={200}
+                    height={200}
+                    editable
+                    remove
                   />
                 </Col>
                 <Col md="9">
