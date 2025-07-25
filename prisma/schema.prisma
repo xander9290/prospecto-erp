@@ -61,6 +61,7 @@ model User {
   userName    String    @unique @map("user_name")
   displayName String    @unique @map("display_name")
   email       String    @unique
+  partnerId   String    @unique
   Partner     Partner   @relation(fields: [partnerId], references: [id])
   darkMode    Boolean   @default(false) @map("dark_mode")
   createdById String?   @map("created_by")
