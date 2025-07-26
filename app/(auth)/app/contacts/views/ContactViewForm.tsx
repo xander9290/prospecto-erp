@@ -71,17 +71,20 @@ function ContactViewForm() {
     defaultValues: initFields,
   });
 
-  const [imageId] = watch(["imageId"]);
+  const [imageId] = watch(["imageId", "userId"]);
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     const toastId = toast.loading("Cargando...", { position: "bottom-right" });
     setDisabled(true);
     if (modelId && modelId === "null") {
+      //@ts-expect-error solo necesita el id del many2one
+      const userId = data.userId?.id || null;
       const newPartner: TInputs = {
         ...data,
         name: data.name.toUpperCase(),
         displayType: partnerType,
         imageId: data.imageId || null,
+        userId,
       };
       const res = await createPartner({ data: newPartner });
       if (!res.success) {
@@ -110,11 +113,10 @@ function ContactViewForm() {
   };
 
   const handleFetchPartner = async () => {
-    const toastId = toast.loading("Cargando...", { position: "top-right" });
     setDisabled(true);
     const res = await fetchPartner({ id: modelId });
     if (!res.success) {
-      toast.error(res.message, { id: toastId });
+      toast.error(res.message);
       return;
     }
 
@@ -122,8 +124,6 @@ function ContactViewForm() {
 
     originalValuesRef.current = partner;
     reset(partner);
-    setDisabled(false);
-    toast.dismiss(toastId);
   };
 
   useEffect(() => {
@@ -141,7 +141,14 @@ function ContactViewForm() {
   return (
     <FormViewTemplate
       viewForm={`/app/contacts?view_mode=form&id=null&filter=${partnerType}`}
-      formActions={[]}
+      formActions={[
+        {
+          string: disabled ? "desbloquear" : "bloquear",
+          action: () => {
+            setDisabled(!disabled);
+          },
+        },
+      ]}
       formStates={formStates}
       name={displayTypes[partnerType]}
       state={""}
@@ -151,54 +158,58 @@ function ContactViewForm() {
       revert={handleRevert}
     >
       <ViewGroup title="datos personales">
-        <Form.Group controlId="PartnerImage" className="text-center">
-          <ImageSource
-            entityType="users"
-            width={125}
-            height={125}
-            sourceId={imageId || null}
-            editable={modelId !== "null"}
-            remove={true}
-            getImageId={handleImageId}
-          />
-        </Form.Group>
-        <Form.Group controlId="PartnerName" className="mb-3">
-          <Form.Label>Nombre:</Form.Label>
-          <Form.Control
-            {...register("name", { required: "Este campo es requerido" })}
-            isInvalid={!!errors.name}
-            autoComplete="off"
-            type="text"
-            size="sm"
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.name?.message}
-          </Form.Control.Feedback>
-        </Form.Group>
-        {/*  */}
-        <Form.Group controlId="PartnerPhone" className="mb-3">
-          <Form.Label>Teléfono:</Form.Label>
-          <Form.Control
-            {...register("phone", { required: "Este campo es requerido" })}
-            isInvalid={!!errors.phone}
-            autoComplete="off"
-            type="text"
-            size="sm"
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.phone?.message}
-          </Form.Control.Feedback>
-        </Form.Group>
-        {/*  */}
-        <Form.Group controlId="PartnerEmail" className="mb-3">
-          <Form.Label>Correo:</Form.Label>
-          <Form.Control
-            {...register("email")}
-            autoComplete="off"
-            type="email"
-            size="sm"
-          />
-        </Form.Group>
+        <div className="d-flex justify-content-between">
+          <div className="w-75">
+            <Form.Group controlId="PartnerName" className="mb-3">
+              <Form.Label>Nombre:</Form.Label>
+              <Form.Control
+                {...register("name", { required: "Este campo es requerido" })}
+                isInvalid={!!errors.name}
+                autoComplete="off"
+                type="text"
+                size="sm"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.name?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+            {/*  */}
+            <Form.Group controlId="PartnerPhone" className="mb-3">
+              <Form.Label>Teléfono:</Form.Label>
+              <Form.Control
+                {...register("phone", { required: "Este campo es requerido" })}
+                isInvalid={!!errors.phone}
+                autoComplete="off"
+                type="text"
+                size="sm"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.phone?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+            {/*  */}
+            <Form.Group controlId="PartnerEmail" className="mb-3">
+              <Form.Label>Correo:</Form.Label>
+              <Form.Control
+                {...register("email")}
+                autoComplete="off"
+                type="email"
+                size="sm"
+              />
+            </Form.Group>
+          </div>
+          <Form.Group className="text-end">
+            <ImageSource
+              entityType="users"
+              width={125}
+              height={125}
+              sourceId={imageId || null}
+              editable={modelId !== "null"}
+              remove={true}
+              getImageId={handleImageId}
+            />
+          </Form.Group>
+        </div>
       </ViewGroup>
       <ViewGroup title="Dirección">
         {/*  */}

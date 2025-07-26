@@ -77,21 +77,23 @@ function FormViewTemplate({
 
   return (
     <Row className="h-100 overflow-auto">
-      <Col xs="12" md="8" className="h-100">
+      <Col xs="12" sm="12" md="12" lg="12" xxl="9" className="h-100">
         <Form
           onSubmit={onSubmit}
           style={{ height: "90%" }}
           className="card d-flex flex-column shadow"
         >
-          <fieldset
-            className="card-header d-flex justify-content-between"
-            disabled={disableForm}
-          >
-            <div className="d-flex align-items-center gap-2">
+          <fieldset className="card-header d-flex justify-content-between">
+            <div
+              className="d-flex align-items-center gap-2"
+              style={{ pointerEvents: disableForm ? "none" : "auto" }}
+            >
               {model_id === "null" ? null : (
                 <Button
                   className="fw-bold"
                   onClick={() => router.replace(viewForm)}
+                  size="sm"
+                  disabled={disableForm}
                 >
                   Nuevo
                 </Button>
@@ -101,6 +103,7 @@ function FormViewTemplate({
                 type="submit"
                 title="Guardar"
                 disabled={!isDirty}
+                size="sm"
               >
                 <i className="bi bi-cloud-arrow-up-fill"></i>
               </Button>
@@ -110,6 +113,7 @@ function FormViewTemplate({
                 title="Deshacer"
                 disabled={!isDirty}
                 onClick={revert}
+                size="sm"
               >
                 <i className="bi bi-arrow-counterclockwise"></i>
               </Button>
@@ -119,25 +123,31 @@ function FormViewTemplate({
               <div className="d-none d-md-flex gap-2">
                 {formActions?.map((action, i) => (
                   <Button
-                    variant="info"
+                    size="sm"
+                    variant="warning"
                     key={`form-action-${i}-${action.string}`}
                     onClick={() =>
                       handleActionForm(action.action, action.confirm)
                     }
-                    className="fw-bold"
+                    className="fw-bold text-dark"
                     style={{
                       display: action.invisible ? "none" : "inline-block",
                     }}
                     disabled={action.disable}
                   >
-                    {action.string}
+                    <span className="text-capitalize">{action.string}</span>
                   </Button>
                 ))}
               </div>
 
               {/* Mobile dropdown */}
               <div className="d-flex d-md-none">
-                <DropdownButton variant="info" title="Acciones" align="end">
+                <DropdownButton
+                  variant="warning"
+                  title="Acciones"
+                  align="end"
+                  size="sm"
+                >
                   {formActions
                     ?.filter((action) => !action.invisible)
                     .map((action, i) => (
@@ -160,6 +170,7 @@ function FormViewTemplate({
               onClick={() => router.back()}
               variant="info"
               title="Regresar"
+              size="sm"
             >
               <i className="bi bi-arrow-left"></i>
             </Button>
@@ -199,13 +210,13 @@ function FormViewTemplate({
                 </ListGroup>
               </div>
             </div>
-            <div className="container p-0">
+            <div className="container-fluid p-0">
               <Row className="gy-2">{children}</Row>
             </div>
           </fieldset>
         </Form>
       </Col>
-      <Col xs="12" md="4">
+      <Col xs="12" sm="12" md="12" lg="12" xxl="3">
         En esta parte irá el historial
       </Col>
       <ModalActionConfirm

@@ -38,7 +38,12 @@ export async function fetchContacts({
       orderBy: { createdAt: "asc" },
     });
 
-    const total = await prisma.partner.count({ where: { displayType } });
+    const total = await prisma.partner.count({
+      where: {
+        displayType,
+        OR: [{ displayName: { contains: search, mode: "insensitive" } }],
+      },
+    });
 
     return {
       success: true,

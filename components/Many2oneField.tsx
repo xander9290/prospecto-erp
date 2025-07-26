@@ -81,9 +81,9 @@ function Many2oneField<T extends FieldValues>({
   };
 
   const handleMouseEnter = () => {
-    if (label.trim() === "") {
-      fetchRecommended();
-    }
+    fetchRecommended();
+    // if (label.trim() === "") {
+    // }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,21 +175,24 @@ function Many2oneField<T extends FieldValues>({
       </InputGroup>
 
       {showDropdown && (
-        <ListGroup className="position-absolute w-100 z-3 shadow-sm bg-white mt-1">
-          {!loading && records.length === 0 && (
-            <ListGroup.Item>Sin resultados</ListGroup.Item>
-          )}
-          {!loading &&
-            records.map((opt) => (
-              <ListGroup.Item
-                key={opt.id}
-                action
-                onClick={() => handleSelect(opt)}
-              >
-                {opt.label}
-              </ListGroup.Item>
-            ))}
-        </ListGroup>
+        <small>
+          <ListGroup className="position-absolute w-100 z-3 shadow-sm bg-white mt-1">
+            {!loading && records.length === 0 && (
+              <ListGroup.Item>Sin resultados</ListGroup.Item>
+            )}
+            {!loading &&
+              records.map((opt) => (
+                <ListGroup.Item
+                  key={opt.id}
+                  action
+                  onClick={() => handleSelect(opt)}
+                  className="p-1"
+                >
+                  {opt.label}
+                </ListGroup.Item>
+              ))}
+          </ListGroup>
+        </small>
       )}
     </div>
   );
