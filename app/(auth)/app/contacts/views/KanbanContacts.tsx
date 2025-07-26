@@ -16,7 +16,7 @@ function KanbanContacts({
     <Container fluid>
       <Row className="g-2 py-2">
         {partners?.map((partner) => (
-          <Col key={partner.id} xs="12" md="4">
+          <Col key={partner.id} xs="12" sm="12" md="6" lg="4" xl="4" xxl="3">
             <Link
               href={`/app/contacts?view_mode=form&id=${partner.id}&filter=${filter}`}
               className="card text-decoration-none"

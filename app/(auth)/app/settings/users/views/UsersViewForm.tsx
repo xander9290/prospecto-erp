@@ -31,7 +31,6 @@ const formStates: TFormState[] = [
 ];
 
 type TInputs = {
-  userName: string;
   password: string;
   email: string;
   name: string;
@@ -40,7 +39,6 @@ type TInputs = {
 };
 
 const defaultValues: TInputs = {
-  userName: "",
   password: "",
   email: "",
   name: "",
@@ -109,7 +107,7 @@ function UserViewForm() {
     }
 
     const newData: TInputs = {
-      userName: res.data?.userName || "",
+      userName: res.data?.name || "",
       email: res.data?.email || "",
       name: res.data?.Partner.name || "",
       password: "", // si quieres dejarlo vacío

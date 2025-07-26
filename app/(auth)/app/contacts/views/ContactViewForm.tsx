@@ -9,14 +9,14 @@ import FormViewTemplate, {
 } from "@/components/templates/FormViewTemplate";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
-import { PartnerType, Partner } from "@/generate/prisma";
+import { PartnerType, Partner, User } from "@/generate/prisma";
 import { Form } from "react-bootstrap";
 import ImageSource from "@/components/ImageSource";
-import Many2oneField from "@/components/Many2oneField";
 import { createPartner, fetchPartner } from "../contacts-actions";
 import toast from "react-hot-toast";
 import { PartnerContacts } from "@/libs/definitions";
 import { userImageUpdate } from "@/app/actions/user-actions";
+import { Many2one } from "@/components/Many2one";
 
 const formStates: TFormState[] = [];
 
@@ -48,7 +48,7 @@ const initFields: TInputs = {
   state: "",
 };
 
-function ContactViewForm() {
+function ContactViewForm({ users }: { users: User[] | null }) {
   const originalValuesRef = useRef<TInputs | null>(initFields);
 
   const [disabled, setDisabled] = useState(false);
@@ -71,7 +71,7 @@ function ContactViewForm() {
     defaultValues: initFields,
   });
 
-  const [imageId] = watch(["imageId", "userId"]);
+  const [imageId, userId] = watch(["imageId", "userId"]);
 
   const onSubmit: SubmitHandler<TInputs> = async (data) => {
     const toastId = toast.loading("Cargando...", { position: "bottom-right" });
@@ -159,7 +159,7 @@ function ContactViewForm() {
     >
       <ViewGroup title="datos personales">
         <div className="d-flex justify-content-between">
-          <div className="w-75">
+          <div style={{ minWidth: "70%" }}>
             <Form.Group controlId="PartnerName" className="mb-3">
               <Form.Label>Nombre:</Form.Label>
               <Form.Control
@@ -273,14 +273,12 @@ function ContactViewForm() {
         </NotePage>
         <NotePage eventKey="salePurchase" title="Venta y Compra">
           <ViewGroup title="ventas">
-            <Form.Group controlId="UserId">
-              <Form.Label>Agente:</Form.Label>
-              <Many2oneField
-                {...register("userId")}
-                model="user"
-                control={control}
-              />
-            </Form.Group>
+            <Many2one<User>
+              options={users}
+              {...register("userId")}
+              control={control}
+              label="Agente"
+            />
           </ViewGroup>
         </NotePage>
         <NotePage eventKey="otherInfo" title="Otra información">

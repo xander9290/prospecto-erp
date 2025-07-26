@@ -2,6 +2,7 @@ import { PartnerType } from "@/generate/prisma";
 import { fetchContacts } from "../contacts-actions";
 import ContactViewList, { ContactFilter } from "./ContactViewList";
 import ContactViewForm from "./ContactViewForm";
+import { fetchUsers } from "@/app/actions/user-actions";
 
 async function ContactsMainView({
   viewMode,
@@ -21,6 +22,9 @@ async function ContactsMainView({
   const contacts = res.data?.contacts || null;
   const total = res.data?.total || 0;
 
+  const resUsers = await fetchUsers({ skip: 1, perPage, search: "" });
+  const users = resUsers.data?.users || null;
+
   if (viewMode === "list") {
     return (
       <ContactViewList
@@ -32,7 +36,7 @@ async function ContactsMainView({
       />
     );
   } else if (viewMode === "form") {
-    return <ContactViewForm />;
+    return <ContactViewForm users={users} />;
   }
 }
 

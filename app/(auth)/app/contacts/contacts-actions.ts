@@ -5,7 +5,7 @@ import { auth } from "@/libs/auth";
 import { ActionResponse, PartnerContacts } from "@/libs/definitions";
 import prisma from "@/libs/prisma";
 
-type ResponseContact = {
+export type ResponseContact = {
   contacts: PartnerContacts[];
   total: number;
 };

@@ -1,6 +1,6 @@
 "use server";
 
-import { PartnerType } from "@/generate/prisma";
+import { PartnerType, User } from "@/generate/prisma";
 import { auth, signIn } from "@/libs/auth";
 import { ActionResponse, UserWithPartner } from "@/libs/definitions";
 import prisma from "@/libs/prisma";
@@ -93,7 +93,7 @@ export async function createUser({
         createdById: session?.user.id,
         User: {
           create: {
-            userName,
+            name,
             email,
             password: hashedPassword,
             displayName: `[${name}] ${userName}`,
@@ -128,22 +128,22 @@ export async function createUser({
 }
 
 export async function loginUser({
-  userName,
+  name,
   password,
 }: {
-  userName: string;
+  name: string;
   password: string;
 }): Promise<ActionResponse<unknown>> {
   try {
     const result = await signIn("credentials", {
-      email: userName,
+      email: name,
       password,
       redirect: false,
     });
 
     const checkIsActive = await prisma.user.findUnique({
       where: {
-        userName,
+        name,
       },
     });
 
@@ -406,7 +406,7 @@ export async function updateUser({
         id,
       },
       data: {
-        userName,
+        name,
         email,
         state,
         displayName: `[${userName}] ${name}`,
@@ -437,6 +437,49 @@ export async function updateUser({
     return {
       success: false,
       message: "Error al editar usuario @catch",
+    };
+  }
+}
+
+export type ResponseUser = {
+  users: User[];
+  total: number;
+};
+export async function fetchUsers({
+  search,
+  skip,
+  perPage,
+}: {
+  search: string;
+  skip: number;
+  perPage: number;
+}): Promise<ActionResponse<ResponseUser>> {
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [{ displayName: { contains: search, mode: "insensitive" } }],
+      },
+      skip: (skip - 1) * perPage,
+      take: perPage,
+      orderBy: { createdAt: "asc" },
+    });
+
+    const total = await prisma.partner.count({
+      where: {
+        OR: [{ displayName: { contains: search, mode: "insensitive" } }],
+      },
+    });
+
+    return {
+      success: true,
+      message: "Contactos cargados",
+      data: { users, total },
+    };
+  } catch (error: unknown) {
+    console.error(error);
+    return {
+      success: false,
+      message: "Error al cargar Partner @trycatch",
     };
   }
 }

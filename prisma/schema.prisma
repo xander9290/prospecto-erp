@@ -59,7 +59,7 @@ model User {
   partnerId   String    @unique @map("partner_id")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
-  userName    String    @unique @map("user_name")
+  name        String    @unique @map("user_name")
   displayName String    @unique @map("display_name")
   email       String    @unique
   Partner     Partner   @relation(fields: [partnerId], references: [id])
@@ -69,7 +69,7 @@ model User {
   Partners     Partner[] @relation("CreateUid")
   PartnerLeads Partner[] @relation("AgentUser")
 
-  @@index([displayName, userName, email])
+  @@index([displayName, name, email])
   @@map("users")
 }
 
